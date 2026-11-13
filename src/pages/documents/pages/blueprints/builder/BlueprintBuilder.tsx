@@ -3,222 +3,29 @@ import {
   blobToBase64,
   Builder as Builder$,
   BuilderContext,
-  CreateBlueprintSignatoryProps,
-  CreateClientTabProps,
-  CreateDialogProps,
-  SendDialogButtonProps,
-  SendDialogProps,
-  SignatorySelectorProps,
 } from '@docuninja/builder2.0';
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { docuNinjaEndpoint } from '$app/common/helpers';
-import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { Document } from '$app/common/interfaces/docuninja/api';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
-import { Modal } from '$app/components/Modal';
 import { ResourceActions } from '$app/components/ResourceActions';
-import { TabGroup } from '$app/components/TabGroup';
-import {
-  Alertbox,
-  ConfirmationDialog,
-  ConfirmationDialogButton,
-  CreateDialogTabButton,
-  CreateUserForm,
-  DeleteButton,
-  DeleteDialog,
-  ImportFromGoogleDrive,
-  Loading,
-  MapSignatoriesFlowButton,
-  MapSignatoriesFlowDialog,
-  PreviewRefresh,
-  PreviewToggle,
-  RectangleSettingsButton,
-  RectangleSettingsCheckbox,
-  RectangleSettingsDialog,
-  RectangleSettingsInput,
-  RectangleSettingsLabel,
-  RectangleSettingsOptionItem,
-  RectangleSettingsOptionsList,
-  RectangleSettingsRemoveButton,
-  RectangleSettingsSaveButton,
-  RectangleSettingsSelect,
-  ToolboxContext,
-  UninviteButton,
-  UninviteDialog,
-  Upload,
-  UploadDialog,
-  ValidationErrors,
-} from '$app/pages/documents/builder/components';
-import { AsyncSignatorySelector } from '$app/pages/documents/common/components/AsyncSignatorySelector';
+import { ImportFromGoogleDrive } from '$app/pages/documents/builder/components';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
-import { SignatorySwap } from './Elements';
-
-function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal title={t('send_confirmation')} visible={open} onClose={onOpenChange}>
-      {content}
-
-      <div
-        onClick={(event) => {
-          event.stopPropagation();
-
-          window.dispatchEvent(new CustomEvent('builder:send.document.submit'));
-        }}
-      >
-        {action}
-      </div>
-    </Modal>
-  );
-}
-
-function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
-  const [t] = useTranslation();
-
-  const params = useParams();
-
-  const { data: document } = useQuery({
-    queryKey: ['/api/blueprints', params.id],
-    queryFn: () =>
-      request(
-        'GET',
-        docuNinjaEndpoint(
-          `/api/blueprints/${params.id}?includeUrl&includePreviews`
-        ),
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              'X-DOCU-NINJA-TOKEN'
-            )}`,
-          },
-        }
-      ).then(
-        (response: GenericSingleResourceResponse<Document>) =>
-          response.data.data
-      ),
-    refetchOnWindowFocus: false,
-    initialData: null,
-  });
-
-  const handleSend = async () => {
-    if (!document) {
-      toast.error('document_not_found');
-      return;
-    }
-
-    toast.processing();
-
-    request(
-      'POST',
-      docuNinjaEndpoint(`/api/blueprints/${document.id}/send`),
-      {
-        invitations: document.invitations || [],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
-        },
-      }
-    ).then(() => {
-      toast.success('document_queued_for_sending');
-      $refetch(['blueprints']);
-    });
-  };
-
-  return (
-    <Button
-      className="w-full"
-      behavior="button"
-      disabled={isSubmitting}
-      onClick={handleSend}
-      disableWithoutIcon
-    >
-      {t('send')}
-    </Button>
-  );
-}
-
-export function CreateDialog({
-  open,
-  onOpenChange,
-  client,
-  user,
-}: CreateDialogProps) {
-  const [t] = useTranslation();
-  return (
-    <Modal
-      title={t('create_client_or_user')}
-      visible={open}
-      onClose={onOpenChange}
-      withoutHorizontalPadding
-      withoutVerticalMargin
-    >
-      <TabGroup
-        tabs={[t('client'), t('user')]}
-        withHorizontalPadding
-        horizontalPaddingWidth="1.5rem"
-        width="full"
-        className="pt-3"
-      >
-        <div className="px-4 sm:px-6 pt-2">{client}</div>
-        <div className="px-4 sm:px-6 pt-2">{user}</div>
-      </TabGroup>
-    </Modal>
-  );
-}
-
-function CreateClientForm({ fields, errors }: CreateClientTabProps) {
-  const [t] = useTranslation();
-
-  return (
-    <>
-      {fields.map((field) => (
-        <div key={field.name} className="mb-4">
-          <InputField
-            label={t(field.name)}
-            errorMessage={errors?.errors[field.name]}
-            onValueChange={field.onValueChange}
-          />
-        </div>
-      ))}
-    </>
-  );
-}
-
-function SignatorySelector({
-  results,
-  onSelect,
-  value,
-  setCreateDialogOpen,
-}: SignatorySelectorProps) {
-  return (
-    <AsyncSignatorySelector
-      results={results}
-      onSelect={onSelect}
-      setCreateDialogOpen={setCreateDialogOpen}
-      valuePrefix="client"
-    />
-  );
-}
+import { SignatorySelector, SignatorySwap } from './Elements';
 
 function BlueprintBuilder() {
   const { t, i18n } = useTranslation();
@@ -459,8 +266,6 @@ function BlueprintBuilder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
-        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-        {/* @ts-ignore - BuilderContext.Provider type conflict with external types */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
@@ -469,69 +274,12 @@ function BlueprintBuilder() {
               onMessage: (message) => toast.info(message),
               onMessageDismiss: () => null,
             },
-            components: {
-              skeleton: Loading,
-              createBlueprintSignatory: CreateBlueprintSignatory,
-              save: () => null,
-              send: {
-                trigger: () => null,
-                dialog: SendDialog,
-                button: SendDialogButton,
-              },
-              delete: {
-                dialog: DeleteDialog,
-                button: DeleteButton,
-              },
-              upload: {
-                trigger: Upload,
-                dialog: UploadDialog,
-              },
-              confirmation: {
-                dialog: ConfirmationDialog,
-                button: ConfirmationDialogButton,
-              },
-              createSignatory: {
-                dialog: CreateDialog,
-                client: {
-                  form: CreateClientForm,
-                  button: CreateDialogTabButton,
-                },
-                user: {
-                  form: CreateUserForm,
-                  button: CreateDialogTabButton,
-                },
-              },
+            slots: {
+              helper: () => null,
               signatorySelector: SignatorySelector,
               signatorySwap: SignatorySwap,
-              mapSignatoriesFlow: {
-                dialog: MapSignatoriesFlowDialog,
-                button: MapSignatoriesFlowButton,
-              },
-              uninvite: {
-                dialog: UninviteDialog,
-                button: UninviteButton,
-              },
-              validationErrors: ValidationErrors,
-              sign: () => null,
-              toolboxContext: ToolboxContext,
-              helper: () => null,
-              alert: Alertbox,
-              previewToggle: PreviewToggle,
-              previewRefresh: PreviewRefresh,
               imports: {
                 googleDrive: ImportFromGoogleDrive,
-              },
-              rectangleSettings: {
-                dialog: RectangleSettingsDialog,
-                save: RectangleSettingsSaveButton,
-                button: RectangleSettingsButton,
-                input: RectangleSettingsInput,
-                label: RectangleSettingsLabel,
-                checkbox: RectangleSettingsCheckbox,
-                select: RectangleSettingsSelect,
-                removeButton: RectangleSettingsRemoveButton,
-                optionItem: RectangleSettingsOptionItem,
-                optionsList: RectangleSettingsOptionsList,
               },
             },
             styles: {
@@ -581,6 +329,9 @@ function BlueprintBuilder() {
               leftSidebar: {
                 visible: !isAuthoredDocument,
               },
+              showSaveButton: false,
+              showSignButton: false,
+              showSendButton: false,
             },
             endpoint: import.meta.env.VITE_DOCUNINJA_API_URL as string,
             blueprint: true,
@@ -593,6 +344,10 @@ function BlueprintBuilder() {
                   data: blueprint?.grapesjs,
                 }
               : undefined,
+            defaultDateFormat: dateFormat as
+              | 'MM/DD/YYYY'
+              | 'DD/MM/YYYY'
+              | 'YYYY-MM-DD',
             services: {
               google: {
                 appId: import.meta.env.VITE_GOOGLE_APP_ID,
@@ -623,18 +378,6 @@ function BlueprintBuilder() {
         />
       )}
     </Default>
-  );
-}
-
-export function CreateBlueprintSignatory({
-  onClick,
-}: CreateBlueprintSignatoryProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button type="secondary" behavior="button" onClick={onClick}>
-      {t('new_signatory')}
-    </Button>
   );
 }
 
