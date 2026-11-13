@@ -71,6 +71,7 @@ function Builder() {
   const { t, i18n } = useTranslation();
 
   const { id } = useParams();
+  const { dateFormat } = useCurrentCompanyDateFormats();
   const [searchParams] = useSearchParams();
   const isFromTemplate = searchParams.get('from_template') === 'true';
 

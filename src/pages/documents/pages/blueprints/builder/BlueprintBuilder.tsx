@@ -1,14 +1,16 @@
 import {
   type AuthoredDocumentData,
-  blobToBase64,
   Builder as Builder$,
   BuilderContext,
+  blobToBase64,
 } from '@docuninja/builder2.0';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { docuNinjaEndpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -19,18 +21,27 @@ import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
 import { Page } from '$app/components/Breadcrumbs';
 import { Card } from '$app/components/cards';
-import { Button } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
 import { ImportFromGoogleDrive } from '$app/pages/documents/builder/google-drive';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 import { SignatorySelector, SignatorySwap } from './Elements';
 
+function Loading() {
+  return (
+    <div className="flex justify-center items-center py-6 sm:py-8 px-4 sm:px-6">
+      <Spinner />
+    </div>
+  );
+}
+
 function BlueprintBuilder() {
   const { t, i18n } = useTranslation();
 
   const { id } = useParams();
+  const { dateFormat } = useCurrentCompanyDateFormats();
   const colors = useColorScheme();
 
   const { data: blueprintResponse } = useBlueprintQuery({ id });
@@ -135,9 +146,7 @@ function BlueprintBuilder() {
       {
         signal,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem(
-            'X-DOCU-NINJA-TOKEN'
-          )}`,
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
         },
         onUploadProgress: ({ loaded, total }) => {
           if (total) onProgress?.(loaded / total);
