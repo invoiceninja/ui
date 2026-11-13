@@ -12,7 +12,13 @@ import {
   SignatorySelectorProps,
   SignatorySwapProps,
 } from '@docuninja/builder2.0';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { IoMdSwap } from 'react-icons/io';
 import { useColorScheme } from '$app/common/colors';
@@ -31,6 +37,16 @@ export function SignatorySwap({
   const triggerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelStyle, setPanelStyle] = useState<React.CSSProperties>();
+
+  const close = useCallback(() => {
+    setIsOpen(false);
+
+    requestAnimationFrame(() => {
+      triggerRef.current
+        ?.querySelector<HTMLElement>('button, [tabindex="0"]')
+        ?.focus();
+    });
+  }, []);
 
   useLayoutEffect(() => {
     if (!isOpen) {
@@ -88,22 +104,31 @@ export function SignatorySwap({
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsOpen(false);
+        close();
       }
     };
 
     document.addEventListener('keydown', onKeyDown);
 
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [isOpen]);
-
-  const close = () => setIsOpen(false);
+  }, [close, isOpen]);
 
   return (
     <>
       <div ref={triggerRef}>
         {trigger ? (
-          <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+          <div
+            role="button"
+            tabIndex={0}
+            className="cursor-pointer"
+            onClick={() => setIsOpen(!isOpen)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setIsOpen(!isOpen);
+              }
+            }}
+          >
             {trigger}
           </div>
         ) : (
