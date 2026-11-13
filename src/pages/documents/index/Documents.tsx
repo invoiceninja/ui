@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { docuNinjaAtom } from '$app/common/atoms/docuninja';
+import { useColorScheme } from '$app/common/colors';
 import {
   useDocuNinjaAdmin,
   useDocuNinjaPaidUser,
@@ -49,6 +50,7 @@ import { DocumentSettingsModal } from '../show/components/DocumentSettingsModal'
 export default function Documents() {
   useTitle('documents');
   const [t] = useTranslation();
+  const colors = useColorScheme();
   const navigate = useNavigate();
 
   const company = useCurrentCompany();
@@ -245,7 +247,7 @@ export default function Documents() {
               >
                 <div className="flex items-center space-x-2">
                   <div>
-                    <Gear />
+                    <Gear color={colors.$3} />
                   </div>
 
                   <span>{t('settings')}</span>

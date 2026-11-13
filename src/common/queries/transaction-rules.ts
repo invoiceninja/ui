@@ -44,7 +44,9 @@ export function useTransactionRuleQuery(params: Params) {
     queryFn: () =>
       request(
         'GET',
-        endpoint('/api/v1/bank_transaction_rules/:id', { id: params.id })
+        endpoint('/api/v1/bank_transaction_rules/:id?include=vendor,expense_category', {
+          id: params.id,
+        })
       ).then(
         (response: GenericSingleResourceResponse<TransactionRule>) =>
           response.data.data

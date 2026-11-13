@@ -13,6 +13,7 @@ import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -35,6 +36,7 @@ import { bulk } from '$app/common/queries/products';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useSetAtom } from 'jotai';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
@@ -74,10 +76,10 @@ export function useAllProductColumns() {
     'price',
     'quantity',
     'archived_at',
-    // 'assigned_to', @Todo: Relationship not included.
+    'assigned_user',
     'cost',
     'created_at',
-    // 'created_by', @Todo: Relationship not included.
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -108,10 +110,12 @@ export function useProductColumns() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const disableNavigation = useDisableNavigation();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -140,7 +144,7 @@ export function useProductColumns() {
     {
       column: 'description',
       id: 'notes',
-      label: t('notes'),
+      label: t('description'),
       format: (value) => (
         <Tooltip
           width="auto"
@@ -170,8 +174,8 @@ export function useProductColumns() {
       format: (value, product) =>
         formatMoney(
           value,
-          product.company?.settings.country_id,
-          product.company?.settings.currency_id
+          company?.settings.country_id,
+          company?.settings.currency_id
         ),
     },
     {
@@ -193,8 +197,8 @@ export function useProductColumns() {
       format: (value, product) =>
         formatMoney(
           value,
-          product.company?.settings.country_id,
-          product.company?.settings.currency_id
+          company?.settings.country_id,
+          company?.settings.currency_id
         ),
     },
     {
@@ -293,6 +297,18 @@ export function useProductColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, product) => resolveUserName(product.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, product) => resolveUserName(product.assigned_user_id),
     },
     {
       column: 'tags',

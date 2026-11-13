@@ -10,11 +10,13 @@
 
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Credit } from '$app/common/interfaces/credit';
@@ -41,6 +43,7 @@ interface Props {
 }
 
 export function CloneOptionsModal({ credit, dropdown }: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -59,7 +62,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
 
   const cloneToCredit = () => {
     setCredit({
-      ...credit,
+      ...cloneDeep(credit),
       id: '',
       number: '',
       documents: [],
@@ -86,7 +89,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
 
   const cloneToInvoice = () => {
     setInvoice({
-      ...credit,
+      ...cloneDeep(credit),
       id: '',
       number: '',
       documents: [],
@@ -109,13 +112,13 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
     setIsModalVisible(false);
 
     setTimeout(() => {
-      navigate('/invoices/create?action=clone');
+      navigate(`${invoicePaths.create}?action=clone`);
     }, 150);
   };
 
   const cloneToQuote = () => {
     setQuote({
-      ...(credit as Quote),
+      ...(cloneDeep(credit) as Quote),
       id: '',
       number: '',
       documents: [],
@@ -144,7 +147,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
 
   const cloneToRecurringInvoice = () => {
     setRecurringInvoice({
-      ...(credit as unknown as RecurringInvoice),
+      ...(cloneDeep(credit) as unknown as RecurringInvoice),
       id: '',
       number: '',
       documents: [],
@@ -173,7 +176,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
 
   const cloneToPurchaseOrder = () => {
     setPurchaseOrder({
-      ...(credit as unknown as PurchaseOrder),
+      ...(cloneDeep(credit) as unknown as PurchaseOrder),
       id: '',
       number: '',
       documents: [],
@@ -188,6 +191,7 @@ export function CloneOptionsModal({ credit, dropdown }: Props) {
       po_number: '',
       due_date: '',
       partial_due_date: '',
+      expense_id: '',
       design_id: company.settings.purchase_order_design_id,
       vendor: undefined,
     });

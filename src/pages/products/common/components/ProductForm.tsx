@@ -35,6 +35,7 @@ interface Props {
     property: keyof Product,
     value: Product[keyof Product]
   ) => void;
+  fundamentalConceptVisible?: boolean;
 }
 
 export function ProductForm(props: Props) {
@@ -44,7 +45,8 @@ export function ProductForm(props: Props) {
   const company = useCurrentCompany();
   const taxCategories = useTaxCategories();
 
-  const { errors, handleChange, type, product } = props;
+  const { errors, handleChange, type, product, fundamentalConceptVisible } =
+    props;
 
   return (
     <>
@@ -72,14 +74,16 @@ export function ProductForm(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('tags')}>
-        <TagPillSelector
-          entityType={TAG_ENTITY_TYPES.product}
-          value={product.tags || []}
-          onChange={(tags) => handleChange('tags', tags)}
-          errorMessage={errors?.errors.tags}
-        />
-      </Element>
+      {!fundamentalConceptVisible && (
+        <Element leftSide={t('tags')}>
+          <TagPillSelector
+            entityType={TAG_ENTITY_TYPES.product}
+            value={product.tags || []}
+            onChange={(tags) => handleChange('tags', tags)}
+            errorMessage={errors?.errors.tags}
+          />
+        </Element>
+      )}
 
       <Element leftSide={t('price')}>
         <NumberInputField
@@ -89,7 +93,7 @@ export function ProductForm(props: Props) {
         />
       </Element>
 
-      {company?.enable_product_cost && (
+      {!fundamentalConceptVisible && company?.enable_product_cost && (
         <Element leftSide={t('cost')}>
           <NumberInputField
             value={product.cost || ''}
@@ -99,7 +103,7 @@ export function ProductForm(props: Props) {
         </Element>
       )}
 
-      {company?.enable_product_quantity && (
+      {!fundamentalConceptVisible && company?.enable_product_quantity && (
         <Element leftSide={t('default_quantity')}>
           <NumberInputField
             value={product.quantity || ''}
@@ -111,17 +115,20 @@ export function ProductForm(props: Props) {
         </Element>
       )}
 
-      <Element leftSide={t('max_quantity')}>
-        <NumberInputField
-          value={product.max_quantity || ''}
-          onValueChange={(value) =>
-            handleChange('max_quantity', parseFloat(value))
-          }
-          errorMessage={errors?.errors.max_quantity}
-        />
-      </Element>
+      {!fundamentalConceptVisible && (
+        <Element leftSide={t('max_quantity')}>
+          <NumberInputField
+            value={product.max_quantity || ''}
+            onValueChange={(value) =>
+              handleChange('max_quantity', parseFloat(value))
+            }
+            errorMessage={errors?.errors.max_quantity}
+          />
+        </Element>
+      )}
 
-      {company?.quickbooks &&
+      {!fundamentalConceptVisible &&
+        company?.quickbooks &&
         import.meta.env.VITE_DISABLE_QUICKBOOKS_INTEGRATION !== 'true' && (
           <Element leftSide={t('income_account')}>
             <IncomeAccountSelector
@@ -151,15 +158,17 @@ export function ProductForm(props: Props) {
         <ErrorMessage className="mt-2">{errors?.errors.tax_id}</ErrorMessage>
       </Element>
 
-      <Element leftSide={t('image_url')}>
-        <InputField
-          value={product.product_image}
-          onValueChange={(value) => handleChange('product_image', value)}
-          errorMessage={errors?.errors.product_image}
-        />
-      </Element>
+      {!fundamentalConceptVisible && (
+        <Element leftSide={t('image_url')}>
+          <InputField
+            value={product.product_image}
+            onValueChange={(value) => handleChange('product_image', value)}
+            errorMessage={errors?.errors.product_image}
+          />
+        </Element>
+      )}
 
-      {company?.track_inventory && (
+      {!fundamentalConceptVisible && company?.track_inventory && (
         <>
           <Element leftSide={t('stock_quantity')}>
             <NumberInputField
@@ -259,7 +268,7 @@ export function ProductForm(props: Props) {
         </Element>
       )}
 
-      {company?.custom_fields?.product1 && (
+      {!fundamentalConceptVisible && company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"
           defaultValue={product.custom_value1}
@@ -268,7 +277,7 @@ export function ProductForm(props: Props) {
         />
       )}
 
-      {company?.custom_fields?.product2 && (
+      {!fundamentalConceptVisible && company?.custom_fields?.product2 && (
         <CustomField
           field="custom_value2"
           defaultValue={product.custom_value2}
@@ -277,7 +286,7 @@ export function ProductForm(props: Props) {
         />
       )}
 
-      {company?.custom_fields?.product3 && (
+      {!fundamentalConceptVisible && company?.custom_fields?.product3 && (
         <CustomField
           field="custom_value3"
           defaultValue={product.custom_value3}
@@ -286,7 +295,7 @@ export function ProductForm(props: Props) {
         />
       )}
 
-      {company?.custom_fields?.product4 && (
+      {!fundamentalConceptVisible && company?.custom_fields?.product4 && (
         <CustomField
           field="custom_value4"
           defaultValue={product.custom_value4}

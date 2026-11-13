@@ -9,10 +9,12 @@
  */
 
 import { ApiTransactionType } from '$app/common/enums/transactions';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { Tooltip } from '$app/components/Tooltip';
@@ -36,6 +38,7 @@ import classNames from 'classnames';
 import { TagPills } from '$app/components/tags/TagPills';
 
 export function useTransactionColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
 
   const company = useCurrentCompany();
@@ -48,6 +51,7 @@ export function useTransactionColumns() {
   const formatMoney = useFormatMoney();
   const disableNavigation = useDisableNavigation();
   const cleanDescriptionText = useCleanDescriptionText();
+  const resolveUserName = useResolveUserName();
 
   const columns: DataTableColumnsExtended<Transaction, TransactionColumns> = [
     {
@@ -166,7 +170,7 @@ export function useTransactionColumns() {
         return (
           <div className="flex space-x-2">
             {ids.map((id, index) => (
-              <Link key={id} to={route('/invoices/:id/edit', { id })}>
+              <Link key={id} to={route(invoicePaths.edit, { id })}>
                 {t('invoice')} #{index + 1}
               </Link>
             ))}
@@ -197,6 +201,12 @@ export function useTransactionColumns() {
           </div>
         );
       },
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, transaction) => resolveUserName(transaction.user_id),
     },
     {
       column: 'tags',

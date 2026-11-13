@@ -101,7 +101,7 @@ function EmailSettings() {
           leftSide={
             <div className="flex flex-col">
               <span className="text-sm font-medium">{t('from_name')}</span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 Custom sender name for outgoing document emails.
               </span>
             </div>
@@ -119,7 +119,7 @@ function EmailSettings() {
           leftSide={
             <div className="flex flex-col">
               <span className="text-sm font-medium">{t('reply_to_email')}</span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 Custom reply-to email address for outgoing document emails.
               </span>
             </div>

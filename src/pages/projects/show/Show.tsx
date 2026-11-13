@@ -8,15 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
-import { useEnabled } from '$app/common/guards/guards/enabled';
-import { permission } from '$app/common/guards/guards/permission';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -28,10 +27,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Project } from '$app/common/interfaces/project';
 import { Quote } from '$app/common/interfaces/quote';
-import { Task } from '$app/common/interfaces/task';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
-import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { InputLabel, Link } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -43,28 +39,31 @@ import { Spinner } from '$app/components/Spinner';
 import { TagPills } from '$app/components/tags/TagPills';
 import { ClientActionButtons } from '$app/pages/invoices/common/components/ClientActionButtons';
 import { ProjectAnalytics } from '$app/pages/projects/analytics/ProjectAnalytics';
-import { ModuleBitmask } from '$app/pages/settings';
 import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
-import {
-  defaultColumns,
-  useAllTaskColumns,
-  useCustomBulkActions,
-  useTaskColumns,
-  useTaskFilters,
-  useActions as useTasksActions,
-} from '$app/pages/tasks/common/hooks';
-import { useFilterColumns } from '$app/pages/tasks/common/hooks/useFilterColumns';
-import { useShowEditOption } from '$app/pages/tasks/common/hooks/useShowEditOption';
 import { useActions as useProjectsActions } from '../common/hooks';
+import {
+  ProjectExpenses,
+  useShowProjectExpenses,
+} from './components/ProjectExpenses';
+import {
+  ProjectInvoices,
+  useShowProjectInvoices,
+} from './components/ProjectInvoices';
 import { ProjectPrivateNotes } from './components/ProjectPrivateNotes';
 import { ProjectPublicNotes } from './components/ProjectPublicNotes';
+import {
+  ProjectQuotes,
+  useShowProjectQuotes,
+} from './components/ProjectQuotes';
+import { ProjectTasks, useShowProjectTasks } from './components/ProjectTasks';
 
 dayjs.extend(duration);
 
 export default function Show() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { documentTitle } = useTitle('project');
   const { t } = useTranslation();
   const { id } = useParams();
@@ -73,15 +72,17 @@ export default function Show() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
-  const enabled = useEnabled();
-
-  const pages: Page[] = [
-    { name: t('projects'), href: '/projects' },
-    { name: t('project'), href: route('/projects/:id', { id }) },
-  ];
-
   const { data: project } = useQuery({
     queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
+    queryFn: () =>
+      request('GET', endpoint(`/api/v1/projects/${id}`)).then(
+        (response: GenericSingleResourceResponse<Project>) => response.data.data
+      ),
+    staleTime: Infinity,
+  });
+
+  const { data: projectRelations } = useQuery({
+    queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`, 'relations'],
     queryFn: () =>
       request(
         'GET',
@@ -94,17 +95,21 @@ export default function Show() {
     staleTime: Infinity,
   });
 
+  const pages: Page[] = [
+    { name: t('projects'), href: '/projects' },
+    {
+      name: project?.name || t('project'),
+      href: route('/projects/:id', { id }),
+    },
+  ];
+
   const projectActions = useProjectsActions();
-  const taskActions = useTasksActions();
-  const columns = useTaskColumns();
 
-  const filters = useTaskFilters();
-  const taskColumns = useAllTaskColumns();
-  const filterColumns = useFilterColumns();
+  const showTasks = useShowProjectTasks();
+  const showInvoices = useShowProjectInvoices();
+  const showQuotes = useShowProjectQuotes();
+  const showExpenses = useShowProjectExpenses();
 
-  const customBulkActions = useCustomBulkActions();
-
-  const showEditOption = useShowEditOption();
   const colors = useColorScheme();
 
   const [includeDrafts, setIncludeDrafts] = useState(false);
@@ -114,6 +119,7 @@ export default function Show() {
     changeTemplateVisible,
     setChangeTemplateVisible,
     changeTemplateResources,
+    changeTemplateEntityContext,
   } = useChangeTemplate();
 
   if (!project) {
@@ -124,38 +130,12 @@ export default function Show() {
     );
   }
 
-  const showTasks = enabled(ModuleBitmask.Tasks);
-  const tasksContent = (
-    <DataTable
-      resource="task"
-      columns={columns}
-      customActions={taskActions}
-      endpoint={`/api/v1/tasks?include=status,client,project,user,assigned_user,tags&sort=id|desc&project_tasks=${project.id}&without_deleted_clients=true`}
-      bulkRoute="/api/v1/tasks/bulk"
-      linkToCreate={`/tasks/create?project=${id}&rate=${project.task_rate}`}
-      linkToEdit="/tasks/:id/edit"
-      showEdit={(task: Task) => showEditOption(task)}
-      customFilters={filters}
-      customBulkActions={customBulkActions}
-      customFilterPlaceholder="status"
-      filterColumns={filterColumns}
-      withResourcefulActions
-      rightSide={
-        <DataTableColumnsPicker
-          columns={taskColumns as unknown as string[]}
-          defaultColumns={defaultColumns}
-          table="task"
-        />
-      }
-      linkToCreateGuards={[permission('create_task')]}
-      hideEditableOptions={!hasPermission('edit_task')}
-    />
-  );
+  const projectWithRelations = projectRelations ?? project;
 
   const overviewContent = (forecastCard: ReactNode) => (
     <div className="grid grid-cols-12 gap-4 lg:space-y-0">
       <InfoCard
-        title={project.name}
+        title={projectWithRelations.name}
         className="col-span-12 h-full p-4 shadow-sm lg:col-span-6 xl:col-span-4 2xl:h-max 2xl:col-span-3"
         style={{ borderColor: colors.$24 }}
         withoutPadding
@@ -166,10 +146,10 @@ export default function Show() {
               {t('status')}
             </span>
 
-            <EntityStatus entity={project} />
+            <EntityStatus entity={projectWithRelations} />
           </div>
 
-          {Boolean(project.tags?.length) && (
+          {Boolean(projectWithRelations.tags?.length) && (
             <div className="flex flex-col space-y-1">
               <span
                 className="text-sm font-medium"
@@ -179,43 +159,52 @@ export default function Show() {
               </span>
 
               <div>
-                <TagPills tags={project.tags} />
+                <TagPills tags={projectWithRelations.tags} />
               </div>
             </div>
           )}
 
-          {project.client && (
-            <ClientActionButtons displayClientName client={project.client} />
+          {projectWithRelations.client && (
+            <ClientActionButtons
+              displayClientName
+              client={projectWithRelations.client}
+            />
           )}
 
           {canViewFinancials && (
             <div className="flex flex-col items-start gap-1">
-              {project.invoices?.map((invoice: Invoice, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/invoices/:id/edit', { id: invoice.id })}
-                >
-                  {t('invoice')} #{invoice.number}
-                </Link>
-              ))}
+              {projectWithRelations.invoices?.map(
+                (invoice: Invoice, index: number) => (
+                  <Link
+                    key={index}
+                    to={route('/invoices/:id/edit', { id: invoice.id })}
+                  >
+                    {t('invoice')} #{invoice.number}
+                  </Link>
+                )
+              )}
 
-              {project.quotes?.map((quote: Quote, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/quotes/:id/edit', { id: quote.id })}
-                >
-                  {t('quote')} #{quote.number}
-                </Link>
-              ))}
+              {projectWithRelations.quotes?.map(
+                (quote: Quote, index: number) => (
+                  <Link
+                    key={index}
+                    to={route('/quotes/:id/edit', { id: quote.id })}
+                  >
+                    {t('quote')} #{quote.number}
+                  </Link>
+                )
+              )}
 
-              {project.expenses?.map((expense: Expense, index: number) => (
-                <Link
-                  key={index}
-                  to={route('/expenses/:id/edit', { id: expense.id })}
-                >
-                  {t('expense')} #{expense.number}
-                </Link>
-              ))}
+              {projectWithRelations.expenses?.map(
+                (expense: Expense, index: number) => (
+                  <Link
+                    key={index}
+                    to={route('/expenses/:id/edit', { id: expense.id })}
+                  >
+                    {t('expense')} #{expense.number}
+                  </Link>
+                )
+              )}
             </div>
           )}
         </div>
@@ -249,7 +238,10 @@ export default function Show() {
       topRight={
         canViewFinancials ? (
           <div className="flex flex-shrink-0 items-center justify-end space-x-3 lg:pl-6">
-            <span className="whitespace-nowrap text-sm">
+            <span
+              className="whitespace-nowrap text-sm"
+              style={{ color: colors.$3 }}
+            >
               {t('include_drafts')}
             </span>
 
@@ -259,15 +251,26 @@ export default function Show() {
       }
     >
       <ProjectAnalytics
-        project={project}
+        project={projectWithRelations}
         includeDrafts={includeDrafts}
         overviewContent={overviewContent}
-        tasksContent={showTasks ? tasksContent : undefined}
+        tasksContent={
+          showTasks ? <ProjectTasks project={project} /> : undefined
+        }
+        invoicesContent={
+          showInvoices ? <ProjectInvoices project={project} /> : undefined
+        }
+        quotesContent={
+          showQuotes ? <ProjectQuotes project={project} /> : undefined
+        }
+        expensesContent={
+          showExpenses ? <ProjectExpenses project={project} /> : undefined
+        }
         onCanViewFinancialsChange={setCanViewFinancials}
       />
 
       <ChangeTemplateModal<Project>
-        entity="project"
+        entity={changeTemplateEntityContext?.entity ?? 'project'}
         entities={changeTemplateResources as Project[]}
         visible={changeTemplateVisible}
         setVisible={setChangeTemplateVisible}
@@ -278,7 +281,9 @@ export default function Show() {
             <span>{project.number}</span>
           </div>
         )}
-        bulkUrl="/api/v1/projects/bulk"
+        bulkUrl={
+          changeTemplateEntityContext?.endpoint ?? '/api/v1/projects/bulk'
+        }
       />
     </Default>
   );

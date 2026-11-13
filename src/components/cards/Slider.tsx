@@ -59,7 +59,11 @@ export function Slider(props: Props) {
               <form
                 onSubmit={(event) => event.preventDefault()}
                 className="border flex h-full flex-col shadow-xl"
-                style={{ backgroundColor: colors.$1, borderColor: colors.$20 }}
+                style={{
+                  backgroundColor: colors.$1,
+                  borderColor: colors.$20,
+                  color: colors.$3,
+                }}
               >
                 <div className="flex flex-col flex-1 h-0 overflow-y-auto">
                   <div

@@ -18,6 +18,7 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Checkbox } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
@@ -49,6 +50,7 @@ interface Props {
   onDeleteRowClick: (index: number) => unknown;
   onCreateItemClick: () => unknown;
   shouldCreateInitialLineItem?: boolean;
+  withOptionalLines?: boolean;
 }
 
 export function ProductsTable(props: Props) {
@@ -180,6 +182,23 @@ export function ProductsTable(props: Props) {
                               )}
                             </div>
                           )}
+
+                          {length - 1 === columnIndex &&
+                            props.withOptionalLines && (
+                              <div className="flex justify-end mt-2">
+                                <Checkbox
+                                  label={t('optional')}
+                                  checked={Boolean(lineItem.is_optional)}
+                                  onValueChange={(_, checked) =>
+                                    props.onLineItemPropertyChange(
+                                      'is_optional',
+                                      Boolean(checked),
+                                      getLineItemIndex(lineItem)
+                                    )
+                                  }
+                                />
+                              </div>
+                            )}
                         </Td>
                       ))}
                     </Tr>

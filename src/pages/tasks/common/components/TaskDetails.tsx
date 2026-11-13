@@ -41,8 +41,10 @@ import { formatTime, TaskClock } from '../../kanban/components/TaskClock';
 import { isTaskRunning } from '../helpers/calculate-entity-state';
 import { calculateTime } from '../helpers/calculate-time';
 import { shouldShowStartTaskButton } from '../helpers/task';
+import { useResolveTaskRate } from '../hooks/useResolveTaskRate';
 import { useStart } from '../hooks/useStart';
 import { useStop } from '../hooks/useStop';
+import { EstimatedDurationInput } from './EstimatedDurationInput';
 import { TaskStatus as TaskStatusBadge } from './TaskStatus';
 
 dayjs.extend(duration);
@@ -69,6 +71,7 @@ export function TaskDetails(props: Props) {
 
   const stop = useStop();
   const start = useStart();
+  const resolveTaskRate = useResolveTaskRate();
 
   const calculation = calculateTime(task.time_log, {
     inSeconds: true,
@@ -219,10 +222,7 @@ export function TaskDetails(props: Props) {
                 handleChange('client_id', client.id);
 
                 if (!task.id) {
-                  handleChange(
-                    'rate',
-                    client?.settings?.default_task_rate ?? 0
-                  );
+                  handleChange('rate', resolveTaskRate(client));
                 }
               }}
               clearButton={Boolean(task.client_id)}
@@ -309,6 +309,21 @@ export function TaskDetails(props: Props) {
             onClearButtonClick={() => handleChange('status_id', '')}
             readonly={props.taskModal}
             errorMessage={errors?.errors.status_id}
+          />
+
+          <InputField
+            type="date"
+            label={t('due_date')}
+            value={task.due_date}
+            onValueChange={(value) => handleChange('due_date', value)}
+            errorMessage={errors?.errors.due_date}
+            width="100%"
+          />
+
+          <EstimatedDurationInput
+            value={task.estimated_duration}
+            onValueChange={(value) => handleChange('estimated_duration', value)}
+            errorMessage={errors?.errors.estimated_duration}
           />
 
           <TagPillSelector

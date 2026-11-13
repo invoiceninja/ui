@@ -14,11 +14,13 @@ import { useSearchParams } from 'react-router-dom';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
+import { preventLeavingPageAtom } from '$app/common/hooks/useAddPreventNavigationEvents';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import { InvoicePaymentParams } from '../../common/components/InvoicePayment';
 import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 
 interface Params {
@@ -27,6 +29,8 @@ interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   isFormBusy: boolean;
   setIsFormBusy: Dispatch<SetStateAction<boolean>>;
+  payment: InvoicePaymentParams | undefined;
+  setPayment: Dispatch<SetStateAction<InvoicePaymentParams | undefined>>;
 }
 export function useHandleSave(params: Params) {
   const {
@@ -35,6 +39,8 @@ export function useHandleSave(params: Params) {
     isDefaultFooter,
     isFormBusy,
     setIsFormBusy,
+    payment,
+    setPayment,
   } = params;
 
   const [searchParams] = useSearchParams();
@@ -42,6 +48,7 @@ export function useHandleSave(params: Params) {
   const saveCompany = useHandleCompanySave();
   const refreshCompanyUsers = useRefreshCompanyUsers();
   const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+  const setPreventLeavingPage = useSetAtom(preventLeavingPageAtom);
 
   return async (invoice: Invoice) => {
     if (isFormBusy) {
@@ -65,7 +72,7 @@ export function useHandleSave(params: Params) {
       apiEndpoint += 'save_default_footer=true';
     }
 
-    const invoicePayload = { ...invoice };
+    const invoicePayload = { ...invoice, ...payment };
 
     delete invoicePayload.paymentables;
 
@@ -79,9 +86,27 @@ export function useHandleSave(params: Params) {
 
         $refetch(['products', 'invoices']);
 
+        if (payment) {
+          $refetch(['payments']);
+          setPayment(undefined);
+        }
+
         if (searchParams.get('action') === 'add_tasks') {
           $refetch(['tasks']);
         }
+
+        if (searchParams.get('action') === 'invoice_expense') {
+          $refetch(['expenses']);
+        }
+
+        setPreventLeavingPage(
+          (current) =>
+            current && {
+              ...current,
+              prevent: false,
+              actionKey: undefined,
+            }
+        );
       })
       .catch((error) => {
         if (error.response?.status === 422) {

@@ -81,6 +81,14 @@ export function AddUninvoicedItemsButton(props: Props) {
     setSelectedProducts([]);
   };
 
+  const handleSelectProduct = (product: Product) => {
+    setSelectedProducts((current) =>
+      current.some(({ id }) => id === product.id)
+        ? current
+        : [...current, product]
+    );
+  };
+
   const handleReset = () => {
     if (currentTabIndex === 0) {
       setSelectedProducts([]);
@@ -148,7 +156,10 @@ export function AddUninvoicedItemsButton(props: Props) {
             withoutWrapping
           >
             <RoundButton
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setSelectedProducts([]);
+                setIsModalOpen(true);
+              }}
               style={{
                 backgroundColor: colors.$3,
               }}
@@ -181,13 +192,16 @@ export function AddUninvoicedItemsButton(props: Props) {
           <div className="flex flex-col space-y-4 pt-1 px-4">
             <ProductSelector
               label={t('products') as string}
-              onChange={(product) =>
-                setSelectedProducts((current) => [
-                  ...current,
-                  product.resource as Product,
-                ])
+              onChange={({ resource }) => {
+                if (resource) {
+                  handleSelectProduct(resource);
+                }
+              }}
+              onProductCreated={(product) =>
+                product && handleSelectProduct(product)
               }
-              withoutAction
+              exclude={selectedProducts.map(({ id }) => id)}
+              nullable={false}
               clearInputAfterSelection
               withShadow
             />

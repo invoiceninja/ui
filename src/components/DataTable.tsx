@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { cloneDeep, get, isEqual } from 'lodash';
@@ -74,6 +74,7 @@ import {
   Td,
   Th,
   Thead,
+  Tr,
 } from './tables';
 import { TFooter } from './tables/TFooter';
 
@@ -125,6 +126,7 @@ interface StyleOptions {
   withoutRightBorder?: boolean;
   headerBackgroundColor?: string;
   thChildrenClassName?: string;
+  thTextColor?: string;
   tBodyStyle?: CSSProperties;
   thClassName?: string;
   tdClassName?: string;
@@ -197,6 +199,7 @@ interface Props<T> extends CommonProps {
   withoutPageAsPreference?: boolean;
   withoutStoringPreferences?: boolean;
   withRecordScopedFilters?: boolean;
+  recordScopeId?: string;
   withoutSortQueryParameter?: boolean;
   showRestoreBulk?: (selectedResources: T[]) => boolean;
   enableSavingFilterPreference?: boolean;
@@ -207,6 +210,7 @@ interface Props<T> extends CommonProps {
   onSelectedResourcesChange?: (selectedResources: T[]) => void;
   preSelected?: string[];
   emptyState?: ReactNode;
+  afterRows?: ReactNode;
   beforeFilterInput?: ReactNode;
   withoutBottomRounding?: boolean;
   withoutBottomPadding?: boolean;
@@ -265,6 +269,8 @@ function DataTableCheckbox({
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
 
+  const queryClient = useQueryClient();
+
   const colors = useColorScheme();
   const options = useDataTableOptions();
   const reactSettings = useReactSettings();
@@ -309,6 +315,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutPageAsPreference = false,
     withoutStoringPreferences = false,
     withRecordScopedFilters = false,
+    recordScopeId,
     filterColumns,
     onSelectedResourcesChange,
     preSelected = [],
@@ -402,6 +409,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     withoutStoringPage: withoutPageAsPreference,
     withoutStoringPreferences,
     withRecordScopedFilters,
+    recordScopeId,
     enableSavingFilterPreference,
   });
 
@@ -691,6 +699,10 @@ export function DataTable<T extends object>(props: Props<T>) {
         );
       })
       .finally(() => {
+        if (queryIdentificator) {
+          queryClient.invalidateQueries({ queryKey: [queryIdentificator] });
+        }
+
         refetchByUrl([props.endpoint, apiEndpoint.pathname]);
         setSelected([]);
       });
@@ -1122,6 +1134,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       setSort(data.sort);
                     }}
                     childrenClassName={styleOptions?.thChildrenClassName}
+                    textColor={styleOptions?.thTextColor}
                     resizable={`${apiEndpoint.pathname}.${column.id}`}
                     useOnlyCurrentSortDirectionIcon={
                       styleOptions?.useOnlyCurrentSortDirectionIcon
@@ -1380,6 +1393,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                 </MemoizedTr>
               ))}
           </Tbody>
+
+          {props.afterRows && (
+            <Tbody>
+              <Tr withoutBackgroundColor>
+                <Td colSpan={100}>{props.afterRows}</Td>
+              </Tr>
+            </Tbody>
+          )}
 
           {Boolean(footerColumns.length) &&
             Boolean(currentData?.length) &&

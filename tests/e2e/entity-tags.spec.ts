@@ -301,6 +301,55 @@ for (const entityCase of ENTITY_CASES) {
   });
 }
 
+const countTagWrites = (page: Page) => {
+  const state = { count: 0 };
+
+  page.on('request', (request) => {
+    const isTagWrite =
+      request.url().includes('/api/v1/tags') &&
+      ['POST', 'PUT'].includes(request.method());
+
+    if (isTagWrite) {
+      state.count += 1;
+    }
+  });
+
+  return state;
+};
+
+test('blocks a comma tag name in the tag selector', async ({ page, api }) => {
+  await login(page);
+
+  const client = await createEntity(api, 'clients', {
+    name: uniqueName('comma-tag-client'),
+  });
+
+  const editUrl = `/clients/${client.id}/edit`;
+
+  await page.goto(editUrl);
+  await page.waitForURL(`**${editUrl}`);
+
+  const input = page.locator('[data-cy="tagSelectorInput"]').first();
+  await input.waitFor({ state: 'visible', timeout: 15000 });
+
+  const tagWrites = countTagWrites(page);
+  const name = `${uniqueName('comma-tag')},13`;
+
+  await input.click();
+  await input.fill(name);
+
+  await page.locator('[data-cy="createTagOption"]').first().click();
+
+  await expect(page.locator('.error-message-box')).toBeVisible({
+    timeout: 10000,
+  });
+
+  expect(tagWrites.count).toBe(0);
+
+  await expect(page.locator('[data-cy="createTagOption"]')).toHaveCount(0);
+  await expect(input).toHaveValue(name);
+});
+
 test('can create and persist a tag on a bank transaction', async ({
   page,
   api,

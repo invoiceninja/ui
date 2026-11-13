@@ -14,6 +14,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -49,6 +50,9 @@ import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { Icon } from '$app/components/icons/Icon';
 import { MdRuleFolder } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
+import { useAtomValue } from 'jotai';
+import { fullTableLatestDataAtom } from '$app/common/atoms/data-table';
+import { TransactionStatus } from '$app/common/enums/transactions';
 
 export default function Transactions() {
   useTitle('transactions');
@@ -72,13 +76,20 @@ export default function Transactions() {
   const selectedColumns =
     reactSettings?.react_table_columns?.transaction || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.bankTransaction,
     'bank_transaction_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: false,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'bank_transaction_tag_ids');
+
+  const navigationData = useAtomValue(fullTableLatestDataAtom);
 
   const [sliderTitle, setSliderTitle] = useState<string>();
   const [transactionId, setTransactionId] = useState<string>('');
@@ -97,6 +108,38 @@ export default function Transactions() {
     }
   };
 
+  const getNextTransaction = () => {
+    if (navigationData?.type !== 'transaction') {
+      return undefined;
+    }
+
+    const transactions = navigationData.resources as Transaction[];
+
+    const currentIndex = transactions.findIndex(
+      ({ id }) => id === transactionId
+    );
+
+    if (currentIndex === -1) {
+      return undefined;
+    }
+
+    return transactions
+      .slice(currentIndex + 1)
+      .find(({ status_id }) => status_id !== TransactionStatus.Converted);
+  };
+
+  const openNextTransaction = () => {
+    const nextTransaction = getNextTransaction();
+
+    if (nextTransaction) {
+      getSelectedTransaction(nextTransaction);
+
+      return;
+    }
+
+    setTransactionId('');
+  };
+
   return (
     <>
       <Slider
@@ -108,6 +151,7 @@ export default function Transactions() {
         <Details
           transactionId={transactionId}
           setTransactionId={setTransactionId}
+          onConverted={openNextTransaction}
         />
       </Slider>
 
@@ -120,7 +164,9 @@ export default function Transactions() {
           resource="transaction"
           endpoint={`/api/v1/bank_transactions?sort=id|desc&active_banks=true${
             shouldShowTagFilter ? '&include=tags' : ''
-          }${shouldShowTagFilter ? '' : '&tag_ids='}`}
+          }${shouldShowTagFilter ? '' : '&tag_ids='}${
+            shouldShowUserFilter ? '' : '&user_ids='
+          }`}
           bulkRoute="/api/v1/bank_transactions/bulk"
           columns={columns}
           linkToCreate="/transactions/create"
@@ -130,7 +176,10 @@ export default function Transactions() {
           customFilters={filters}
           customBulkActions={customBulkActions}
           customFilterPlaceholder="status"
-          filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+          filterColumns={[
+            ...userFilterColumns,
+            ...(shouldShowTagFilter ? filterColumns : []),
+          ]}
           rightSide={
             <div className="flex items-center space-x-2">
               {((isHosted() && (proPlan() || enterprisePlan())) ||

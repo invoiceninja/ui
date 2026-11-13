@@ -11,12 +11,14 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useColorScheme } from '$app/common/colors';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { Button } from '$app/components/forms';
 
 export function CorpPassSuccess() {
   const { t } = useTranslation();
+  const colors = useColorScheme();
   const refresh = useRefreshCompanyUsers();
   const navigate = useNavigate();
   const accentColor = useAccentColor();
@@ -48,11 +50,11 @@ export function CorpPassSuccess() {
           </svg>
         </div>
 
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-semibold" style={{ color: colors.$3 }}>
           {t('peppol_successfully_configured')}
         </h1>
 
-        <p className="text-gray-600">
+        <p style={{ color: colors.$3 }}>
           CorpPass verification completed successfully. Your Peppol registration
           is being finalized.
         </p>

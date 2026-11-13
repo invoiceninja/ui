@@ -46,6 +46,7 @@ export const useBulkAction = (params?: Params) => {
       | 'convert_to_project'
       | 'email'
       | 'approve'
+      | 'cancel'
       | 'mark_sent',
     rest?: Record<string, unknown>
   ) => {
@@ -62,6 +63,8 @@ export const useBulkAction = (params?: Params) => {
 
       if (action === 'approve') {
         toast.success(trans('approved_quotes', { value: ids.length }));
+      } else if (action === 'cancel') {
+        toast.success('cancelled');
       } else {
         toast.success(message);
       }

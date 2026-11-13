@@ -13,8 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
 import { Outlet, useParams } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Expense as ExpenseType } from '$app/common/interfaces/expense';
@@ -37,6 +39,7 @@ import {
   ChangeTemplateModal,
   useChangeTemplate,
 } from '../settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
+import { expenseAtom } from './common/atoms';
 import { DocumentPreview } from './common/components/DocumentPreview';
 import { useActions } from './common/hooks';
 import { useSave } from './edit/hooks/useSave';
@@ -57,7 +60,10 @@ export default function Expense() {
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
-    { name: t('edit_expense'), href: route('/expenses/:id/edit', { id }) },
+    {
+      name: numberBreadcrumb(data?.number, t('edit_expense')),
+      href: route('/expenses/:id/edit', { id }),
+    },
   ];
 
   const tabs: Tab[] = [
@@ -75,7 +81,7 @@ export default function Expense() {
   ];
 
   const [errors, setErrors] = useState<ValidationBag>();
-  const [expense, setExpense] = useState<ExpenseType>();
+  const [expense, setExpense] = useAtomWithPrevent(expenseAtom);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
@@ -115,7 +121,7 @@ export default function Expense() {
         })}
       afterBreadcrumbs={<PreviousNextNavigation entity="expense" />}
     >
-      {expense ? (
+      {expense && expense.id === id ? (
         <div className="space-y-4">
           <Tabs
             tabs={tabs}

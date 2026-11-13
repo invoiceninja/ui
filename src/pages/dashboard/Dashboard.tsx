@@ -11,6 +11,7 @@
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { useOpenFeedbackSlider } from '$app/common/hooks/useOpenFeedbackSlider';
 import { reactSettingsAtom } from '$app/common/hooks/useReactSettings';
@@ -21,7 +22,6 @@ import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
 import { Totals } from '$app/pages/dashboard/components/Totals';
 import { UpcomingInvoices } from '$app/pages/dashboard/components/UpcomingInvoices';
 import { Default } from '../../components/layouts/Default';
-import { ModuleBitmask } from '../settings';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
 import { UpcomingRecurringInvoices } from './components/UpcomingRecurringInvoices';

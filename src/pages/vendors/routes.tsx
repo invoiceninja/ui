@@ -10,13 +10,13 @@
 
 import { lazy, Suspense } from 'react';
 import { Route } from 'react-router-dom';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { Guard } from '$app/common/guards/Guard';
 import { assigned } from '$app/common/guards/guards/assigned';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { TabLoader } from '$app/components/TabLoader';
-import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 
 const Vendors = lazy(() => import('$app/pages/vendors/index/Vendors'));
 const Import = lazy(() => import('$app/pages/vendors/import/Import'));

@@ -138,7 +138,7 @@ function Notifications() {
               <span className="text-sm font-medium">
                 {t('quote_signed_notification')}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 {t('email_client_when_quote_signed_description')}
               </span>
             </div>
@@ -159,7 +159,7 @@ function Notifications() {
               <span className="text-sm font-medium">
                 {t('invoice_signed_notification')}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 {t('email_client_when_invoice_signed_description')}
               </span>
             </div>
@@ -180,7 +180,7 @@ function Notifications() {
               <span className="text-sm font-medium">
                 {t('credit_signed_notification')}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 {t('email_client_when_credit_signed_description')}
               </span>
             </div>
@@ -201,7 +201,7 @@ function Notifications() {
               <span className="text-sm font-medium">
                 {t('purchase_order_signed_notification')}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 {t('email_vendor_when_purchase_order_signed_description')}
               </span>
             </div>
@@ -222,7 +222,7 @@ function Notifications() {
               <span className="text-sm font-medium">
                 {t('custom_document_completed')}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 {t('email_client_when_custom_document_completed')}
               </span>
             </div>
@@ -243,7 +243,7 @@ function Notifications() {
               <span className="text-sm font-medium">
                 {t('attach_audit_log_to_completed_email')}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs" style={{ color: colors.$22 }}>
                 {t('attach_audit_log_to_completed_email_help')}
               </span>
             </div>

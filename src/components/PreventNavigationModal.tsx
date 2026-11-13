@@ -19,6 +19,7 @@ import {
 import { changesAtom } from '$app/common/hooks/useAtomWithPrevent';
 import {
   blockedNavigationActionAtom,
+  navigationDiscardActionsAtom,
   isNavigationModalVisibleAtom,
 } from '$app/common/hooks/usePreventNavigation';
 import { Button } from './forms';
@@ -33,6 +34,7 @@ export function PreventNavigationModal() {
     import.meta.env.VITE_ENABLE_DISCARD_CHANGES_TRACKING === 'true';
 
   const changes = useAtomValue(changesAtom);
+  const discardActions = useAtomValue(navigationDiscardActionsAtom);
 
   const [lastHistoryLocation, setLastHistoryLocation] = useAtom(
     lastHistoryLocationAtom
@@ -68,7 +70,8 @@ export function PreventNavigationModal() {
       nonPreventedLocations[numberOfNonPreventedLocations - 1];
 
     lastNonPreventedLocation =
-      lastNonPreventedLocation !== location.pathname
+      lastNonPreventedLocation !==
+      location.pathname + location.search + location.hash
         ? lastNonPreventedLocation
         : nonPreventedLocations[numberOfNonPreventedLocations - 2];
 
@@ -128,7 +131,16 @@ export function PreventNavigationModal() {
           <Button type="secondary" onClick={handleContinueEditing}>
             {t('continue_editing')}
           </Button>
-          <Button onClick={handleDiscardChanges}>{t('discard_changes')}</Button>
+          <Button
+            disableWithoutIcon
+            disabled={discardActions?.busy}
+            onClick={() => {
+              discardActions?.discard();
+              handleDiscardChanges();
+            }}
+          >
+            {t('discard_changes')}
+          </Button>
         </div>
       </div>
     </Modal>

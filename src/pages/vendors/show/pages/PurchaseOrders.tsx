@@ -56,6 +56,7 @@ export default function PurchaseOrders() {
       hideEditableOptions={!hasPermission('edit_purchase_order')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }

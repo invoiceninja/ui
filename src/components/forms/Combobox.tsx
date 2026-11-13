@@ -266,6 +266,7 @@ export function Combobox<T = any>({
     if (clearInputAfterSelection) {
       setInputValue('');
       setSelectedOption(null);
+      setHighlightedIndex(-1);
     }
 
     setTimeout(() => setIsOpen(false), 100);
@@ -351,7 +352,7 @@ export function Combobox<T = any>({
       return;
     }
 
-    if (inputValue === '') {
+    if (!nullable || inputValue === '') {
       return;
     }
 

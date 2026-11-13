@@ -50,7 +50,7 @@ export function Edit() {
     { name: t('account_management'), href: '/settings/account_management' },
     { name: t('api_tokens'), href: '/settings/integrations/api_tokens' },
     {
-      name: t('edit_token'),
+      name: fetchedApiToken?.name || t('edit_token'),
       href: route('/settings/integrations/api_tokens/:id/edit', { id }),
     },
   ];

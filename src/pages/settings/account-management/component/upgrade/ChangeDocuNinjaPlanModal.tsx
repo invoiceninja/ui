@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useColorScheme } from '$app/common/colors';
 import { Modal } from '$app/components/Modal';
 import { Button, SelectField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +35,7 @@ export function ChangeDocuNinjaPlanModal({
   onErrorClear
 }: Props) {
   const { t } = useTranslation();
+  const colors = useColorScheme();
   const [selectedUserCount, setSelectedUserCount] =
     useState<number>(currentUserCount);
 
@@ -72,7 +74,7 @@ export function ChangeDocuNinjaPlanModal({
       <div className="flex flex-col space-y-6">
         <div className="space-y-4">
           <div>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm mb-2" style={{ color: colors.$22 }}>
               {`${t('docuninja')} ${t('users')}`}:{' '}
               <strong>{currentUserCount}</strong>
             </p>

@@ -9,6 +9,7 @@
  */
 
 import paymentType from '$app/common/constants/payment-type';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -22,6 +23,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -62,10 +64,10 @@ export function useAllPaymentColumns() {
     'type',
     'transaction_reference',
     'archived_at',
-    //   'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     'converted_amount', // @Todo: How's this different to `amount`?
     'created_at',
-    //   'created_by', @Todo: Need to resolve relationship
+    'user',
     //   'credit_number', @Todo: Need to resolve relationship
     firstCustom,
     secondCustom,
@@ -87,6 +89,7 @@ export function useAllPaymentColumns() {
 }
 
 export function usePaymentColumns() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -99,6 +102,7 @@ export function usePaymentColumns() {
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const resolveCurrency = useResolveCurrency();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const calculateConvertedAmount = (payment: Payment) => {
@@ -178,7 +182,7 @@ export function usePaymentColumns() {
               {payment.invoices?.map((invoice) => (
                 <DynamicLink
                   key={invoice.id}
-                  to={route('/invoices/:id/edit', {
+                  to={route(invoicePaths.edit, {
                     id: invoice.id,
                   })}
                   renderSpan={disableNavigation('invoice', invoice)}
@@ -197,7 +201,7 @@ export function usePaymentColumns() {
                 index < 3 && (
                   <DynamicLink
                     key={invoice.id}
-                    to={route('/invoices/:id/edit', {
+                    to={route(invoicePaths.edit, {
                       id: invoice.id,
                     })}
                     renderSpan={disableNavigation('invoice', invoice)}
@@ -360,6 +364,18 @@ export function usePaymentColumns() {
       id: 'updated_at',
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, payment) => resolveUserName(payment.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, payment) => resolveUserName(payment.assigned_user_id),
     },
     {
       column: 'tags',

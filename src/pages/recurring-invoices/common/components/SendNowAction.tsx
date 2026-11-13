@@ -1,8 +1,10 @@
 import { ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { hasContactWithEmail } from '$app/common/helpers/emails/has-contact-with-email';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ErrorMessage } from '$app/components/ErrorMessage';
+import { ContactEmailModal } from '$app/components/emails/ContactEmailModal';
 import { Button } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import { useSave } from '../hooks';
@@ -18,6 +20,7 @@ export function SendNowAction({ recurringInvoice, children }: Props) {
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isContactEmailOpen, setIsContactEmailOpen] = useState<boolean>(false);
 
   const save = useSave({
     setIsFormBusy,
@@ -26,9 +29,17 @@ export function SendNowAction({ recurringInvoice, children }: Props) {
     onSuccess: () => setIsModalVisible(false),
   });
 
+  const hasEmail = hasContactWithEmail(recurringInvoice?.client?.contacts);
+
   return (
     <>
-      <div onClick={() => setIsModalVisible(true)}>{children}</div>
+      <div
+        onClick={() =>
+          hasEmail ? setIsModalVisible(true) : setIsContactEmailOpen(true)
+        }
+      >
+        {children}
+      </div>
 
       <Modal
         title={t('are_you_sure')}
@@ -48,6 +59,13 @@ export function SendNowAction({ recurringInvoice, children }: Props) {
           {t('continue')}
         </Button>
       </Modal>
+
+      <ContactEmailModal
+        visible={isContactEmailOpen}
+        onClose={() => setIsContactEmailOpen(false)}
+        relation="client"
+        relationId={recurringInvoice?.client_id}
+      />
     </>
   );
 }

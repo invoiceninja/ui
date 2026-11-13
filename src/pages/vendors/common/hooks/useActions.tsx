@@ -15,6 +15,7 @@ import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '$app/components/icons/Icon';
 import {
+  MdAddCircleOutline,
   MdArchive,
   MdComment,
   MdDelete,
@@ -22,8 +23,11 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
+import { useEnabled } from '$app/common/guards/guards/enabled';
 import { useBulkAction } from '$app/common/queries/vendor';
 import { Vendor } from '$app/common/interfaces/vendor';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { MergeVendorsAction } from '../components/MergeVendorsAction';
@@ -40,6 +44,8 @@ export function useActions(params?: Params) {
   const { showEditAction, showCommonBulkAction } = params || {};
 
   const bulk = useBulkAction();
+  const enabled = useEnabled();
+  const hasPermission = useHasPermission();
 
   const { isEditOrShowPage } = useEntityPageIdentifier({
     entity: 'vendor',
@@ -56,6 +62,17 @@ export function useActions(params?: Params) {
         </DropdownElement>
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
+    (vendor) =>
+      !vendor.is_deleted &&
+      enabled(ModuleBitmask.Expenses) &&
+      hasPermission('create_expense') && (
+        <DropdownElement
+          to={route('/expenses/create?vendor=:id', { id: vendor.id })}
+          icon={<Icon element={MdAddCircleOutline} />}
+        >
+          {t('create_expense')}
+        </DropdownElement>
+      ),
     (vendor) => (
       <AddActivityComment
         entity="vendor"

@@ -153,7 +153,7 @@ function SelectionStep({
             type="button"
             key={option.id}
             onClick={option.onClick}
-            className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left group"
+            className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-500 hover:bg-opacity-10 transition-all duration-200 text-left group"
             style={{
               borderColor: colors.$20,
             }}
@@ -162,7 +162,9 @@ function SelectionStep({
             <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600">
               {option.title}
             </h3>
-            <p className="text-gray-600 text-sm">{option.description}</p>
+            <p className="text-sm" style={{ color: colors.$22 }}>
+              {option.description}
+            </p>
           </button>
         ))}
       </div>

@@ -18,7 +18,7 @@ interface Props {
   children: ReactNode;
   description?: string;
   className?: string;
-  height?: number;
+  height?: number | string;
   topRight?: ReactNode;
 }
 

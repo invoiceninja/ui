@@ -9,6 +9,7 @@
  */
 
 import { date } from '$app/common/helpers';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -22,6 +23,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -35,20 +37,14 @@ import { useGetTimezone } from '$app/common/hooks/useGetTimezone';
 import { useDateTime } from '$app/common/hooks/useDateTime';
 import { useGetSetting } from '$app/common/hooks/useGetSetting';
 import classNames from 'classnames';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
-import { MdSend, MdTextSnippet, MdWarning } from 'react-icons/md';
+import { MdTextSnippet } from 'react-icons/md';
 import { Assigned } from '$app/components/Assigned';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useNavigate } from 'react-router-dom';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
-import {
-  Classification,
-  PEPPOL_COUNTRIES,
-  PEPPOL_CLASSIFICATIONS,
-} from '$app/common/helpers/peppol-countries';
 import { TagPills } from '$app/components/tags/TagPills';
+import { PeppolSendingStatus } from '$app/components/e-invoice/PeppolSendingStatus';
 import { calculateNetAmount } from '$app/common/helpers/invoices/net-amount';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
@@ -129,6 +125,8 @@ export function useAllInvoiceColumns() {
     'tax_amount',
     'created_at',
     'updated_at',
+    'user',
+    'assigned_user',
     'project',
     'tags',
     'recurring_invoice',
@@ -138,6 +136,7 @@ export function useAllInvoiceColumns() {
 }
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
+  const invoicePaths = useInvoiceEditorPaths();
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = (typeof invoiceColumns)[number];
 
@@ -147,7 +146,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
   const reactSettings = useReactSettings();
-  const currentCompany = useCurrentCompany();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const getSetting = useGetSetting();
@@ -159,42 +157,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
       entity: 'invoice',
     });
-
-  const isPeppolEnabled = (currentInvoice: Invoice) => {
-    if (reactSettings?.preferences?.hide_peppol_sent_status) {
-      return false;
-    }
-
-    return (
-      currentCompany.settings.e_invoice_type === 'PEPPOL' &&
-      PEPPOL_COUNTRIES.includes(currentInvoice.client?.country_id || '') &&
-      PEPPOL_CLASSIFICATIONS[
-        currentInvoice.client?.country_id as keyof typeof PEPPOL_CLASSIFICATIONS
-      ]?.includes(
-        (currentInvoice.client?.classification || 'business') as Classification
-      )
-    );
-  };
-
-  const peppolSendingFailed = (currentInvoice: Invoice) => {
-    return (
-      isPeppolEnabled(currentInvoice) &&
-      currentInvoice.status_id !== InvoiceStatusEnum.Draft &&
-      !currentInvoice.backup?.guid &&
-      !currentInvoice.is_deleted &&
-      !currentInvoice.archived_at
-    );
-  };
-
-  const peppolSendingSuccess = (currentInvoice: Invoice) => {
-    return isPeppolEnabled(currentInvoice) && currentInvoice.backup?.guid;
-  };
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -205,37 +174,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         <div className="flex items-center gap-x-2">
           <InvoiceStatus entity={invoice} />
 
-          {peppolSendingFailed(invoice) && (
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                navigate(route('/invoices/:id/e_invoice', { id: invoice.id }));
-              }}
-            >
-              <Tooltip
-                message={t('peppol_sending_failed') as string}
-                width="auto"
-                placement="top"
-              >
-                <MdWarning color="red" size={20} />
-              </Tooltip>
-            </button>
-          )}
-
-          {peppolSendingSuccess(invoice) && (
-            <Tooltip
-              message={t('peppol_sending_success') as string}
-              width="auto"
-              placement="top"
-            >
-              <MdSend
-                color="#22c55e"
-                size={18}
-                style={{ transform: 'rotate(-45deg)' }}
-              />
-            </Tooltip>
-          )}
+          <PeppolSendingStatus entity="invoice" resource={invoice} />
 
           {['R1', 'R2'].includes(invoice.backup?.document_type ?? '') && (
             <Assigned
@@ -252,7 +191,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                   color={accentColor}
                   onClick={() =>
                     navigate(
-                      route('/invoices/:id/edit', {
+                      route(invoicePaths.edit, {
                         id: invoice.backup?.parent_invoice_id,
                       })
                     )
@@ -277,9 +216,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
                     className="cursor-pointer"
                     fontSize={19}
                     color={accentColor}
-                    onClick={() =>
-                      navigate(route('/invoices/:id/edit', { id }))
-                    }
+                    onClick={() => navigate(route(invoicePaths.edit, { id }))}
                   />
                 }
               />
@@ -293,7 +230,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       label: t('number'),
       format: (value, invoice) => (
         <DynamicLink
-          to={route('/invoices/:id/edit', { id: invoice.id })}
+          to={route(invoicePaths.edit, { id: invoice.id })}
           renderSpan={disableNavigation('invoice', invoice)}
         >
           {value}
@@ -666,6 +603,18 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (_value, invoice) => resolveUserName(invoice.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (_value, invoice) => resolveUserName(invoice.assigned_user_id),
     },
     {
       column: 'tags',

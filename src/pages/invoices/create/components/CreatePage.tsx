@@ -20,6 +20,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { ClientSelector } from '../../common/components/ClientSelector';
 import { InvoiceDetails } from '../../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../../common/components/InvoiceFooter';
+import { InvoicePayment } from '../../common/components/InvoicePayment';
 import { InvoicePreview } from '../../common/components/InvoicePreview';
 import { InvoiceTotals } from '../../common/components/InvoiceTotals';
 import { ProductsTable } from '../../common/components/ProductsTable';
@@ -28,6 +29,7 @@ import { useProductColumns } from '../../common/hooks/useProductColumns';
 import { useTaskColumns } from '../../common/hooks/useTaskColumns';
 import { CreateInvoiceContext } from '../Create';
 import { useInvoiceUtilities } from '../hooks/useInvoiceUtilities';
+import { useDefaultTabIndex } from '$app/common/hooks/useDefaultTabIndex';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -51,11 +53,14 @@ export default function CreatePage() {
     isDefaultTerms,
     setIsDefaultFooter,
     setIsDefaultTerms,
+    payment,
+    setPayment,
   } = context;
 
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const { defaultTabIndex, handleTabChange } = useDefaultTabIndex(invoice);
 
   const {
     handleChange,
@@ -110,7 +115,8 @@ export default function CreatePage() {
         <div className="col-span-12">
           <TabGroup
             tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            defaultTabIndex={defaultTabIndex}
+            onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={invoice?.line_items || []} />;
@@ -194,7 +200,13 @@ export default function CreatePage() {
             onChange={(property, value) =>
               handleChange(property, value as string)
             }
-          />
+          >
+            <InvoicePayment
+              invoice={invoice}
+              payment={payment}
+              setPayment={setPayment}
+            />
+          </InvoiceTotals>
         )}
       </div>
 

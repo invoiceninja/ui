@@ -54,6 +54,7 @@ export default function Quotes() {
       hideEditableOptions={!hasPermission('edit_quote')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }

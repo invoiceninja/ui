@@ -106,6 +106,11 @@ export function PasskeyAuthenticationModal(props: Props) {
 
       if (axiosError.response) {
         toast.error();
+      } else if (
+        error instanceof DOMException &&
+        error.name === 'InvalidStateError'
+      ) {
+        toast.error('passkey_already_registered');
       } else {
         toast.dismiss();
       }

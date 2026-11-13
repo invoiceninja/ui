@@ -27,8 +27,8 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
   MdSwitchRight,
+  MdTextSnippet,
 } from 'react-icons/md';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -41,13 +41,18 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useFormatNumber } from '$app/common/hooks/useFormatNumber';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
@@ -57,6 +62,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBulk, useMarkSent } from '$app/common/queries/purchase-orders';
+import { Assigned } from '$app/components/Assigned';
 import { CopyToClipboardIconOnly } from '$app/components/CopyToClipBoardIconOnly';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { Divider } from '$app/components/cards/Divider';
@@ -65,8 +71,10 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { EntityActionElement } from '$app/components/EntityActionElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Link } from '$app/components/forms';
+import { Files } from '$app/components/icons/Files';
 import { Action } from '$app/components/ResourceActions';
 import { TagPills } from '$app/components/tags/TagPills';
+import { Tooltip } from '$app/components/Tooltip';
 import { AddActivityComment } from '$app/pages/dashboard/hooks/useGenerateActivityElement';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
@@ -79,6 +87,7 @@ import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purc
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
 import { useStatusThemeColorScheme } from '$app/pages/settings/user/components/StatusColorTheme';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { EmailPurchaseOrderAction } from './components/EmailPurchaseOrderAction';
 
 interface CreateProps {
   isDefaultTerms: boolean;
@@ -183,12 +192,12 @@ export function useAllPurchaseOrderColumns() {
     'date',
     'due_date',
     'archived_at',
-    // 'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     // 'client', @Todo: Need to resolve relationship (client+po?)
     'contact_email',
     'contact_name',
     'created_at',
-    // 'created_by', @Todo: Need to resolve relationship
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -207,11 +216,17 @@ export function usePurchaseOrderColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const navigate = useNavigate();
+
+  const accentColor = useAccentColor();
+  const hasPermission = useHasPermission();
+
   const formatMoney = useFormatMoney();
   const formatNumber = useFormatNumber();
   const reactSettings = useReactSettings();
   const disableNavigation = useDisableNavigation();
   const formatCustomFieldValue = useFormatCustomFieldValue();
+  const resolveUserName = useResolveUserName();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
   type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
@@ -228,13 +243,77 @@ export function usePurchaseOrderColumns() {
         id: 'status_id',
         label: t('status'),
         format: (field, purchaseOrder) => (
-          <Link
-            to={route('/purchase_orders/:id/edit', {
-              id: purchaseOrder.id,
-            })}
-          >
-            <PurchaseOrderStatusBadge entity={purchaseOrder} />
-          </Link>
+          <div className="flex items-center space-x-2">
+            <Link
+              to={route('/purchase_orders/:id/edit', {
+                id: purchaseOrder.id,
+              })}
+            >
+              <PurchaseOrderStatusBadge entity={purchaseOrder} />
+            </Link>
+
+            {purchaseOrder.invoice_id && (
+              <Assigned
+                entityId={purchaseOrder.invoice_id}
+                cacheEndpoint="/api/v1/invoices"
+                apiEndpoint="/api/v1/invoices/:id?include=client.group_settings"
+                preCheck={
+                  hasPermission('view_invoice') || hasPermission('edit_invoice')
+                }
+                component={
+                  <Tooltip
+                    message={t('invoice') as string}
+                    width="auto"
+                    placement="top"
+                  >
+                    <MdTextSnippet
+                      className="cursor-pointer"
+                      fontSize={19}
+                      color={accentColor}
+                      onClick={() =>
+                        navigate(
+                          route('/invoices/:id/edit', {
+                            id: purchaseOrder.invoice_id,
+                          })
+                        )
+                      }
+                    />
+                  </Tooltip>
+                }
+              />
+            )}
+
+            {purchaseOrder.quote_id && (
+              <Assigned
+                entityId={purchaseOrder.quote_id}
+                cacheEndpoint="/api/v1/quotes"
+                apiEndpoint="/api/v1/quotes/:id?include=client"
+                preCheck={
+                  hasPermission('view_quote') || hasPermission('edit_quote')
+                }
+                component={
+                  <Tooltip
+                    message={t('quote') as string}
+                    width="auto"
+                    placement="top"
+                  >
+                    <div
+                      className="cursor-pointer"
+                      onClick={() =>
+                        navigate(
+                          route('/quotes/:id/edit', {
+                            id: purchaseOrder.quote_id,
+                          })
+                        )
+                      }
+                    >
+                      <Files size="1.2rem" color={accentColor} />
+                    </div>
+                  </Tooltip>
+                }
+              />
+            )}
+          </div>
         ),
       },
       {
@@ -393,6 +472,20 @@ export function usePurchaseOrderColumns() {
         format: (value) => formatNumber(value),
       },
       {
+        column: 'user',
+        id: 'user_id',
+        label: t('user'),
+        format: (value, purchaseOrder) =>
+          resolveUserName(purchaseOrder.user_id),
+      },
+      {
+        column: 'assigned_user',
+        id: 'assigned_user_id',
+        label: t('assigned_user'),
+        format: (value, purchaseOrder) =>
+          resolveUserName(purchaseOrder.assigned_user_id),
+      },
+      {
         column: 'tags',
         id: 'purchase_order_tag_ids',
         label: t('tags'),
@@ -500,19 +593,13 @@ export function useActions(params: ActionsParams = {}) {
       ),
     () => Boolean(showEditAction) && <Divider withoutPadding />,
     (purchaseOrder) => (
-      <EntityActionElement
+      <EmailPurchaseOrderAction
         {...(!dropdown && {
           key: 'send_email',
         })}
-        entity="purchase_order"
-        actionKey="send_email"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('send_email')}
-        to={route('/purchase_orders/:id/email', { id: purchaseOrder.id })}
-        icon={MdSend}
-      >
-        {t('send_email')}
-      </EntityActionElement>
+        purchaseOrder={purchaseOrder}
+        isDropdown={dropdown}
+      />
     ),
     (purchaseOrder) => (
       <EntityActionElement

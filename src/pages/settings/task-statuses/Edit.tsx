@@ -42,16 +42,16 @@ export function Edit() {
   const actions = useActions();
   const colors = useColorScheme();
 
+  const { data: taskStatusData } = useTaskStatusQuery({ id });
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('task_settings'), href: '/settings/task_settings' },
     {
-      name: t('edit_task_status'),
+      name: taskStatusData?.data.data.name || t('edit_task_status'),
       href: route('/settings/task_statuses/:id/edit', { id }),
     },
   ];
-
-  const { data: taskStatusData } = useTaskStatusQuery({ id });
 
   const [errors, setErrors] = useState<ValidationBag>();
   const { documentTitle, setDocumentTitle } = useTitle('');

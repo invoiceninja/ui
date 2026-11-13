@@ -50,7 +50,7 @@ export function Edit() {
     { name: t('settings'), href: '/settings' },
     { name: t('expense_settings'), href: '/settings/expense_settings' },
     {
-      name: t('edit_expense_category'),
+      name: data?.data.data.name || t('edit_expense_category'),
       href: route('/settings/expense_categories/:id/edit', { id }),
     },
   ];

@@ -25,6 +25,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
@@ -64,12 +65,12 @@ export function useAllClientColumns() {
     'last_login_at',
     'address2',
     'archived_at',
-    //   'assigned_to',
+    'assigned_user',
     'contact_phone',
     'contacts',
     'country',
     'created_at',
-    //   'created_by',
+    'user',
     'credit_balance',
     'currency',
     firstCustom,
@@ -111,6 +112,7 @@ export function useClientColumns() {
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
   const resolveLanguage = useResolveLanguage();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const getContactsColumns = useCallback((client: Client) => {
@@ -438,6 +440,18 @@ export function useClientColumns() {
       column: 'city',
       id: 'city',
       label: t('city'),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, client) => resolveUserName(client.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, client) => resolveUserName(client.assigned_user_id),
     },
     {
       column: 'tags',

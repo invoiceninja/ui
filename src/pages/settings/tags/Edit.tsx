@@ -19,6 +19,7 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useValidateTagName } from '$app/common/hooks/useValidateTagName';
 import {
   resolveTagEntityType,
   TAG_ENTITY_TYPE_OPTIONS,
@@ -46,17 +47,18 @@ function Edit(props: Props) {
 
   const actions = useActions();
   const colors = useColorScheme();
+  const validateTagName = useValidateTagName();
+
+  const { data: tagData } = useTagQuery({ id });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('tags'), href: '/settings/tags' },
     {
-      name: t('edit_tag'),
+      name: tagData?.data.data.name || t('edit_tag'),
       href: route(props.editRoute, { id }),
     },
   ];
-
-  const { data: tagData } = useTagQuery({ id });
 
   const [errors, setErrors] = useState<ValidationBag>();
   const { documentTitle, setDocumentTitle } = useTitle('');
@@ -70,6 +72,14 @@ function Edit(props: Props) {
     event.preventDefault();
 
     if (!isFormBusy) {
+      const validationErrors = validateTagName(tag?.name);
+
+      if (validationErrors) {
+        setErrors(validationErrors);
+
+        return;
+      }
+
       toast.processing();
 
       setErrors(undefined);

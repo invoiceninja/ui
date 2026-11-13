@@ -41,6 +41,9 @@ export function ProductCreate(props: Props) {
 
   const [product, setProduct] = useState<Product>();
 
+  const [fundamentalConceptVisible, setFundamentalConceptVisible] =
+    useState<boolean>(true);
+
   const handleChange = useHandleChange({ setErrors, setProduct });
 
   const handleSave = () => {
@@ -70,10 +73,12 @@ export function ProductCreate(props: Props) {
   };
 
   useEffect(() => {
-    if (blankProduct) {
+    if (blankProduct && props.isModalOpen) {
       setProduct(blankProduct);
+      setErrors(undefined);
+      setFundamentalConceptVisible(true);
     }
-  }, [blankProduct]);
+  }, [blankProduct, props.isModalOpen]);
 
   return (
     <Modal
@@ -89,12 +94,23 @@ export function ProductCreate(props: Props) {
           product={product}
           errors={errors}
           handleChange={handleChange}
+          fundamentalConceptVisible={fundamentalConceptVisible}
         />
       )}
 
-      <Button type="primary" behavior="button" onClick={handleSave}>
-        {t('save')}
-      </Button>
+      <div className="flex justify-end space-x-5">
+        <Button
+          behavior="button"
+          type="secondary"
+          onClick={() => setFundamentalConceptVisible((current) => !current)}
+        >
+          {fundamentalConceptVisible ? t('more_fields') : t('less_fields')}
+        </Button>
+
+        <Button type="primary" behavior="button" onClick={handleSave}>
+          {t('save')}
+        </Button>
+      </div>
     </Modal>
   );
 }

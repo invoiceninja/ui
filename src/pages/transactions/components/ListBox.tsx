@@ -8,14 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useQueries } from '@tanstack/react-query';
 import classNames from 'classnames';
 import collect from 'collect.js';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { Client } from '$app/common/interfaces/client';
 import CommonProps from '$app/common/interfaces/common-props.interface';
+import { ExpenseCategory } from '$app/common/interfaces/expense-category';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Vendor } from '$app/common/interfaces/vendor';
 import { useClientsQuery } from '$app/common/queries/clients';
 import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
 import { useExpensesQuery } from '$app/common/queries/expenses';
@@ -62,6 +68,8 @@ interface Props extends CommonProps {
   selectedIds: string[];
   calculateTotal?: boolean;
   addSelectAllButton?: boolean;
+  seededExpenseCategories?: ExpenseCategory[];
+  seededVendors?: Vendor[];
 }
 
 export function ListBox(props: Props) {
@@ -103,12 +111,75 @@ export function ListBox(props: Props) {
   const { data: vendorsResponse } = useVendorsQuery({
     filter: searchParams.searchTerm,
     enabled: isVendorsDataKey,
+    with: props.selectedIds?.join(','),
   });
+
+  const missingVendorIds = useMemo(() => {
+    if (!isVendorsDataKey || !props.selectedIds?.length) {
+      return [];
+    }
+
+    return props.selectedIds.filter(
+      (id) => !vendorsResponse?.some((vendor) => vendor.id === id)
+    );
+  }, [isVendorsDataKey, props.selectedIds, vendorsResponse]);
+
+  const selectedVendorQueries = useQueries({
+    queries: missingVendorIds.map((id) => ({
+      queryKey: ['/api/v1/vendors', id],
+      queryFn: () =>
+        request('GET', endpoint('/api/v1/vendors/:id', { id })).then(
+          (response: GenericSingleResourceResponse<Vendor>) => response.data.data
+        ),
+      enabled: isVendorsDataKey,
+      staleTime: Infinity,
+    })),
+  });
+
+  const selectedVendors = selectedVendorQueries
+    .map((query) => query.data)
+    .filter((vendor): vendor is Vendor => Boolean(vendor));
 
   const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
     filter: searchParams.searchTerm,
     enabled: isExpenseCategoriesDataKey,
+    with: props.selectedIds?.join(','),
   });
+
+  const missingExpenseCategoryIds = useMemo(() => {
+    if (!isExpenseCategoriesDataKey || !props.selectedIds?.length) {
+      return [];
+    }
+
+    return props.selectedIds.filter(
+      (id) =>
+        !expenseCategoriesResponse?.some((category) => category.id === id)
+    );
+  }, [
+    expenseCategoriesResponse,
+    isExpenseCategoriesDataKey,
+    props.selectedIds,
+  ]);
+
+  const selectedExpenseCategoryQueries = useQueries({
+    queries: missingExpenseCategoryIds.map((id) => ({
+      queryKey: ['/api/v1/expense_categories', id],
+      queryFn: () =>
+        request(
+          'GET',
+          endpoint('/api/v1/expense_categories/:id', { id })
+        ).then(
+          (response: GenericSingleResourceResponse<ExpenseCategory>) =>
+            response.data.data
+        ),
+      enabled: isExpenseCategoriesDataKey,
+      staleTime: Infinity,
+    })),
+  });
+
+  const selectedExpenseCategories = selectedExpenseCategoryQueries
+    .map((query) => query.data)
+    .filter((category): category is ExpenseCategory => Boolean(category));
 
   const { data: paymentsResponse } = usePaymentsQuery({
     include: 'client',
@@ -207,9 +278,43 @@ export function ListBox(props: Props) {
     if (isInvoicesDataKey) {
       items = getFormattedResourceList(invoicesResponse);
     } else if (isVendorsDataKey) {
-      items = getFormattedResourceList(vendorsResponse);
+      const seededVendors = props.seededVendors ?? [];
+
+      const mergedVendors = [
+        ...seededVendors,
+        ...selectedVendors,
+        ...(vendorsResponse ?? []).filter(
+          (vendor) =>
+            !seededVendors.some((seededVendor) => seededVendor.id === vendor.id) &&
+            !selectedVendors.some((selectedVendor) => selectedVendor.id === vendor.id)
+        ),
+      ];
+
+      items = getFormattedResourceList(
+        mergedVendors.length ? mergedVendors : vendorsResponse
+      );
     } else if (isExpenseCategoriesDataKey) {
-      items = getFormattedResourceList(expenseCategoriesResponse);
+      const seededExpenseCategories = props.seededExpenseCategories ?? [];
+
+      const mergedExpenseCategories = [
+        ...seededExpenseCategories,
+        ...selectedExpenseCategories,
+        ...(expenseCategoriesResponse ?? []).filter(
+          (category) =>
+            !seededExpenseCategories.some(
+              (seededCategory) => seededCategory.id === category.id
+            ) &&
+            !selectedExpenseCategories.some(
+              (selectedCategory) => selectedCategory.id === category.id
+            )
+        ),
+      ];
+
+      items = getFormattedResourceList(
+        mergedExpenseCategories.length
+          ? mergedExpenseCategories
+          : expenseCategoriesResponse
+      );
     } else if (isPaymentsDataKey) {
       items = getFormattedResourceList(paymentsResponse);
     } else {
@@ -232,9 +337,14 @@ export function ListBox(props: Props) {
     invoicesResponse,
     vendorsResponse,
     expenseCategoriesResponse,
+    selectedExpenseCategories,
     clientsResponse,
     paymentsResponse,
     expensesResponse,
+    props.selectedIds,
+    props.seededExpenseCategories,
+    props.seededVendors,
+    selectedVendors,
   ]);
 
   useEffect(() => {

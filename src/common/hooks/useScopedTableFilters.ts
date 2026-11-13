@@ -9,7 +9,7 @@
  */
 
 import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 import { PerPage } from '$app/components/DataTable';
 
 export interface ScopedTableFilters {
@@ -34,7 +34,7 @@ export const scopedTableFiltersAtom = atom<ScopedTableFiltersState | null>(
 export function useRecordFiltersScope(scopeId: string | undefined) {
   const setScopedFilters = useSetAtom(scopedTableFiltersAtom);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!scopeId) {
       return;
     }

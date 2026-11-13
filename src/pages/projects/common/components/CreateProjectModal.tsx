@@ -30,6 +30,8 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankProjectQuery } from '$app/common/queries/projects';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { Button, InputField } from '$app/components/forms';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { InputLabel } from '$app/components/forms/InputLabel';
 import { Modal } from '$app/components/Modal';
 import { Spinner } from '$app/components/Spinner';
 import { TagPillSelector } from '$app/components/tags/TagPillSelector';
@@ -162,6 +164,14 @@ export function CreateProjectModal(props: Props) {
               onChange={(tags) => handleChange('tags', tags)}
               errorMessage={errors?.errors.tags}
             />
+
+            <div>
+              <InputLabel className="mb-1">{t('color')}</InputLabel>
+              <ColorPicker
+                value={project.color}
+                onValueChange={(color) => handleChange('color', color)}
+              />
+            </div>
 
             <InputField
               label={t('due_date')}

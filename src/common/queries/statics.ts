@@ -10,6 +10,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { endpoint } from '$app/common/helpers';
+import { currentToken } from '$app/common/helpers/company-session';
 import { request } from '$app/common/helpers/request';
 import { Statics } from '$app/common/interfaces/statics';
 
@@ -22,7 +23,7 @@ export function useStaticsQuery() {
         (response) => response.data
       ),
 
-    enabled: Boolean(localStorage.getItem('X-NINJA-TOKEN')),
+    enabled: Boolean(currentToken()),
     staleTime: Infinity,
   });
 }

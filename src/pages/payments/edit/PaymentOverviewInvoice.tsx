@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { dateUTC } from '$app/common/helpers/payment';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -47,6 +48,7 @@ export function setLabel(
 }
 
 export function PaymentOverviewInvoice(props: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const formatMoney = useFormatMoney();
@@ -67,7 +69,7 @@ export function PaymentOverviewInvoice(props: Props) {
               <span style={{ color: colors.$3 }}>{t('invoice')}</span>
 
               <Link
-                to={route('/invoices/:id/edit', {
+                to={route(invoicePaths.edit, {
                   id: props.paymentable.invoice_id,
                 })}
               >

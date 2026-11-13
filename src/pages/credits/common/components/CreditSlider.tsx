@@ -9,6 +9,7 @@
  */
 
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { TabGroup } from '$app/components/TabGroup';
 import { DocumentsTable } from '$app/components/DocumentsTable';
@@ -88,6 +89,7 @@ const Box = styled.div`
 `;
 
 export function CreditSlider() {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -443,7 +445,7 @@ export function CreditSlider() {
                 onClick={() => {
                   !disableNavigation('invoice', invoiceResponse) &&
                     navigate(
-                      route('/invoices/:id/edit', {
+                      route(invoicePaths.edit, {
                         id: invoiceResponse.id,
                       })
                     );

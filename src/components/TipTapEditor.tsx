@@ -54,6 +54,8 @@ import { PiPencilSimpleFill } from 'react-icons/pi';
 import { useClickAway, useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { useColorScheme } from '$app/common/colors';
+import { compressImageToMaxBytes } from '$app/common/helpers/image-compression';
+import { toast } from '$app/common/helpers/toast/toast';
 import { Button, InputField, InputLabel } from './forms';
 import { Icon } from './icons/Icon';
 import { Modal } from './Modal';
@@ -634,6 +636,60 @@ const EditorWrapper = styled.div<{ theme: ThemeProps }>`
       margin: 1em 0;
     }
 
+    [data-resize-container] {
+      max-width: 100%;
+      margin: 1em 0;
+    }
+
+    [data-resize-container].ProseMirror-selectednode {
+      outline: 2px solid ${(props) => props.theme.linkColor};
+      outline-offset: 2px;
+    }
+
+    [data-resize-wrapper] {
+      max-width: 100%;
+
+      img {
+        margin: 0;
+      }
+    }
+
+    [data-resize-handle] {
+      width: 10px;
+      height: 10px;
+      background: ${(props) => props.theme.linkColor};
+      border: 1px solid #fff;
+      border-radius: 2px;
+      z-index: 2;
+      box-sizing: border-box;
+    }
+
+    [data-resize-handle='top-left'],
+    [data-resize-handle='bottom-right'] {
+      cursor: nwse-resize;
+    }
+
+    [data-resize-handle='top-right'],
+    [data-resize-handle='bottom-left'] {
+      cursor: nesw-resize;
+    }
+
+    [data-resize-handle='top-left'] {
+      transform: translate(-50%, -50%);
+    }
+
+    [data-resize-handle='top-right'] {
+      transform: translate(50%, -50%);
+    }
+
+    [data-resize-handle='bottom-left'] {
+      transform: translate(-50%, 50%);
+    }
+
+    [data-resize-handle='bottom-right'] {
+      transform: translate(50%, 50%);
+    }
+
     table {
       border-collapse: collapse;
       margin: 1em 0;
@@ -964,6 +1020,58 @@ function ColorPickerComponent({
   );
 }
 
+const ResizableImage = Image.extend({
+  atom: true,
+
+  addNodeView() {
+    const parent = this.parent?.();
+
+    if (!parent) {
+      return null;
+    }
+
+    return (props) => {
+      const nodeView = parent(props);
+
+      if (!nodeView) {
+        return nodeView;
+      }
+
+      const dom = nodeView.dom as HTMLElement;
+      const image = dom.querySelector('img');
+
+      if (!image) {
+        return nodeView;
+      }
+
+      const { width, height } = props.node.attrs;
+
+      if (width) {
+        image.style.width = `${width}px`;
+      }
+
+      if (height) {
+        image.style.height = `${height}px`;
+      }
+
+      // v3.19 hides the image until onload. A cached data URL can finish loading
+      // before that handler is attached, which leaves the image invisible.
+      const show = () => {
+        dom.style.visibility = '';
+        dom.style.pointerEvents = '';
+      };
+
+      if (image.complete) {
+        show();
+      }
+
+      image.addEventListener('error', show);
+
+      return nodeView;
+    };
+  },
+});
+
 export function TipTapEditor({
   value,
   onValueChange,
@@ -1006,11 +1114,18 @@ export function TipTapEditor({
         },
         validate: (href: string) => /^https?:\/\//.test(href),
       }),
-      Image.configure({
-        inline: true,
+      ResizableImage.configure({
+        inline: false,
         allowBase64: true,
         HTMLAttributes: {
           class: 'editor-image',
+        },
+        resize: {
+          enabled: true,
+          directions: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+          minWidth: 50,
+          minHeight: 50,
+          alwaysPreserveAspectRatio: true,
         },
       }),
       CustomTable.configure({
@@ -1122,10 +1237,15 @@ export function TipTapEditor({
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const src = e.target?.result as string;
-        if (src) {
-          editor.chain().focus().setImage({ src }).run();
+        if (!src) return;
+
+        try {
+          const image = await compressImageToMaxBytes(src);
+          editor.chain().focus().setImage({ src: image }).run();
+        } catch {
+          toast.error('image_upload_failed');
         }
       };
       reader.readAsDataURL(file);

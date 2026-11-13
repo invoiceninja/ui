@@ -9,6 +9,7 @@
  */
 
 import { Element } from '$app/components/cards';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { Link } from '$app/components/forms';
 import { TagPills } from '$app/components/tags/TagPills';
 import {
@@ -41,9 +42,11 @@ import { useColorScheme } from '$app/common/colors';
 interface Props {
   transactionId: string;
   setTransactionId: Dispatch<SetStateAction<string>>;
+  onConverted?: () => void;
 }
 
 export function Details(props: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
@@ -62,11 +65,9 @@ export function Details(props: Props) {
     enabled: Boolean(transaction),
   });
 
-  const isMatched = TransactionStatus.Matched === transaction?.status_id;
-
   const { data: bankTransactionRuleResponse } = useTransactionRuleQuery({
     id: transaction?.bank_transaction_rule_id || '',
-    enabled: Boolean(transaction) && isMatched,
+    enabled: Boolean(transaction?.bank_transaction_rule_id),
   });
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
@@ -201,7 +202,7 @@ export function Details(props: Props) {
               className="cursor-pointer"
             >
               <Link
-                to={route('/invoices/:id/edit', {
+                to={route(invoicePaths.edit, {
                   id,
                 })}
               >
@@ -262,8 +263,9 @@ export function Details(props: Props) {
             </Element>
           ))}
         </>
-      ) : (
+      ) : transaction ? (
         <TransactionMatchDetails
+          key={props.transactionId}
           transactionDetails={{
             base_type: transaction?.base_type || '',
             transaction_id: transaction?.id || '',
@@ -273,8 +275,9 @@ export function Details(props: Props) {
           }}
           isCreditTransactionType={isCreditTransactionType}
           transactionRule={bankTransactionRuleResponse}
+          onConverted={props.onConverted}
         />
-      )}
+      ) : null}
     </div>
   );
 }

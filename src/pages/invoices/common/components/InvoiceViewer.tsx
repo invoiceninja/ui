@@ -83,7 +83,9 @@ export function InvoiceViewer(props: Props) {
       return;
     }
 
-    if (debouncedResourceKey === lastFetchedKeyRef.current) {
+    const requestKey = `${props.link}|${debouncedResourceKey}`;
+
+    if (requestKey === lastFetchedKeyRef.current) {
       setIsLoading(false);
       return;
     }
@@ -117,7 +119,7 @@ export function InvoiceViewer(props: Props) {
                 return response;
               }
 
-              lastFetchedKeyRef.current = fetchKey;
+              lastFetchedKeyRef.current = requestKey;
 
               const blob = new Blob([response.data], {
                 type: renderAsHTML ? 'text/html' : 'application/pdf',

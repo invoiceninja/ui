@@ -11,7 +11,10 @@
 import { atom, useAtom, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { isNavigationModalVisibleAtom } from './usePreventNavigation';
+import {
+  blockedNavigationActionAtom,
+  isNavigationModalVisibleAtom,
+} from './usePreventNavigation';
 
 interface PreventLeavingPage {
   prevent: boolean;
@@ -34,6 +37,7 @@ export const lastHistoryLocationAtom = atom<HistoryLocation>({
 });
 export function useAddPreventNavigationEvents() {
   const location = useLocation();
+  const setBlockedNavigationAction = useSetAtom(blockedNavigationActionAtom);
 
   const setIsNavigationModalVisible = useSetAtom(isNavigationModalVisibleAtom);
   const [preventLeavingPage, setPreventLeavingPage] = useAtom(
@@ -50,7 +54,7 @@ export function useAddPreventNavigationEvents() {
         preventLeavingPage.actionKey !== 'switchCompany'
       ) {
         event.preventDefault();
-
+        event.returnValue = '';
         return true;
       }
     };
@@ -68,6 +72,7 @@ export function useAddPreventNavigationEvents() {
 
     const handlePopState = () => {
       if (preventLeavingPage.prevent) {
+        setBlockedNavigationAction(undefined);
         if (isLastPushDifferent) {
           history.pushState(null, document.title, window.location.href);
         }
@@ -96,7 +101,7 @@ export function useAddPreventNavigationEvents() {
         ...current,
         nonPreventedLocations: [
           ...current.nonPreventedLocations,
-          location.pathname,
+          location.pathname + location.search + location.hash,
         ],
       }));
   }, [location]);

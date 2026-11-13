@@ -24,8 +24,10 @@ import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { $refetch, RefetchKey } from '$app/common/hooks/useRefetch';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Settings } from '$app/common/interfaces/company.interface';
+import { useDesignQuery } from '$app/common/queries/designs';
 import { Page } from '$app/components/Breadcrumbs';
 import { Sparkle } from '$app/components/icons/Sparkle';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
@@ -61,6 +63,8 @@ export default function InvoiceDesign() {
 
   const { id } = useParams();
 
+  const { data: design } = useDesignQuery({ id, enabled: true });
+
   const tabs = useTabs();
   const location = useLocation();
   useInjectCompanyChanges();
@@ -80,6 +84,8 @@ export default function InvoiceDesign() {
     ? location.pathname.endsWith('/custom_designs')
     : true;
 
+  const showProBadge = useShouldDisableAdvanceSettings();
+
   const ProBadge = () => (
     <div className="flex space-x-0.5 items-center text-xs py-1 px-2 bg-[#2176FF26] rounded">
       <div>
@@ -97,7 +103,7 @@ export default function InvoiceDesign() {
     {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
-      afterName: <ProBadge />,
+      afterName: showProBadge && <ProBadge />,
     },
   ];
 
@@ -109,11 +115,11 @@ export default function InvoiceDesign() {
       href: '/settings/invoice_design/custom_designs',
     },
     {
-      name: t('design'),
+      name: design?.name || t('design'),
       href: id
         ? route('/settings/invoice_design/custom_designs/:id/edit', { id })
         : '/settings/invoice_design/custom_designs/create',
-      afterName: <ProBadge />,
+      afterName: showProBadge && <ProBadge />,
     },
   ];
 

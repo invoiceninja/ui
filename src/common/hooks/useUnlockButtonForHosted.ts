@@ -10,6 +10,7 @@
 
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { isHosted } from '$app/common/helpers';
+import { isAccountPlanExpired } from '$app/common/helpers/account-plan';
 import { useAdmin } from './permissions/useHasPermission';
 import { useCurrentAccount } from './useCurrentAccount';
 
@@ -17,11 +18,10 @@ export function useUnlockButtonForHosted() {
   const account = useCurrentAccount();
   const { isAdmin, isOwner } = useAdmin();
 
-  const isPlanExpired = new Date(account?.plan_expires) < new Date();
-
   return (
     isHosted() &&
-    (freePlan() || (account?.plan && isPlanExpired)) &&
+    (freePlan() ||
+      isAccountPlanExpired(account?.plan, account?.plan_expires)) &&
     (isAdmin || isOwner)
   );
 }

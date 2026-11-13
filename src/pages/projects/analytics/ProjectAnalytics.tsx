@@ -11,6 +11,7 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from '$app/common/colors';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { Project } from '$app/common/interfaces/project';
@@ -23,25 +24,27 @@ import {
   ProjectVelocityRow,
 } from '$app/common/interfaces/project-analytics';
 import { useProjectAnalyticsQuery } from '$app/common/queries/project-analytics';
-import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { Burnup } from '$app/pages/projects/burnup/Burnup';
-import { ModuleBitmask } from '$app/pages/settings';
 import { AnalyticsCard } from './components/AnalyticsCard';
-import { AnalyticsStatCard } from './components/AnalyticsStatCard';
+import {
+  AnalyticsStatCard,
+  AnalyticsStatCardSkeleton,
+} from './components/AnalyticsStatCard';
 import { ForecastSummary } from './components/ForecastSummary';
 import { ANALYTICS_CHART_COLORS } from './constants';
 import { findProjectRow, getNestedRows } from './helpers';
 import { useFormatAnalyticsValue } from './hooks/useFormatAnalyticsValue';
-import { ExpensesTab } from './tabs/ExpensesTab';
-import { ProfitTab } from './tabs/ProfitTab';
-import { TimeTab } from './tabs/TimeTab';
+import { ChartsTab } from './tabs/ChartsTab';
 
 interface Props {
   project: Project;
   includeDrafts: boolean;
   overviewContent: (forecastCard: ReactNode) => ReactNode;
   tasksContent?: ReactNode;
+  invoicesContent?: ReactNode;
+  quotesContent?: ReactNode;
+  expensesContent?: ReactNode;
   onCanViewFinancialsChange?: (canViewFinancials: boolean) => void;
 }
 
@@ -50,6 +53,9 @@ export function ProjectAnalytics({
   includeDrafts,
   overviewContent,
   tasksContent,
+  invoicesContent,
+  quotesContent,
+  expensesContent,
   onCanViewFinancialsChange,
 }: Props) {
   const [t] = useTranslation();
@@ -219,11 +225,12 @@ export function ProjectAnalytics({
     <AnalyticsCard
       title={t('summary')}
       className="col-span-12 md:col-span-6 xl:col-span-4 2xl:col-span-3"
-      height={420}
+      height="auto"
     >
       <ForecastSummary
         project={project}
         forecast={sections?.forecastCompletion}
+        estimatedVsLogged={sections?.estimatedVsLogged}
         formatter={formatValue}
         canViewFinancials={canViewFinancials}
       />
@@ -235,11 +242,28 @@ export function ProjectAnalytics({
       label: t('overview'),
       content: (
         <div className="space-y-4">
-          {hasAnalyticsData && (
+          {!analytics.isLoading && !hasAnalyticsData && (
+            <div
+              className="rounded-md border p-4 text-sm"
+              style={{
+                backgroundColor: colors.$1,
+                borderColor: colors.$24,
+                color: colors.$22,
+              }}
+            >
+              {t('no_project_analytics_data')}
+            </div>
+          )}
+
+          {(hasAnalyticsData || analytics.isLoading) && (
             <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-3">
-              {statCards.map((stat, index) => (
-                <AnalyticsStatCard key={index} {...stat} />
-              ))}
+              {analytics.isLoading
+                ? financialStatCards.map((_, index) => (
+                    <AnalyticsStatCardSkeleton key={index} />
+                  ))
+                : statCards.map((stat, index) => (
+                    <AnalyticsStatCard key={index} {...stat} />
+                  ))}
             </div>
           )}
 
@@ -255,49 +279,58 @@ export function ProjectAnalytics({
           },
         ]
       : []),
-    ...(canViewFinancials
+    ...(invoicesContent
       ? [
           {
-            label: t('money'),
-            content: sections && (
-              <ProfitTab
-                projectName={project.name}
-                profitability={sections.profitability}
-                budgetVsActual={sections.budgetVsActual}
-                invoiceProgress={sections.invoiceProgress}
-                formatter={formatValue}
-              />
-            ),
+            label: t('invoices'),
+            content: invoicesContent,
           },
         ]
       : []),
-    ...(canViewFinancials && showTaskTabs
+    ...(quotesContent
       ? [
           {
-            label: t('time'),
-            content: sections && (
-              <TimeTab
-                projectName={project.name}
-                estimatedVsLogged={sections.estimatedVsLogged}
-                projectHealth={sections.projectHealth}
-                teamContribution={sections.teamContribution}
-                timeDistribution={sections.timeDistribution}
-                velocityTrend={sections.velocityTrend}
-                formatter={formatValue}
-              />
-            ),
+            label: t('quotes'),
+            content: quotesContent,
           },
         ]
       : []),
-    ...(canViewFinancials
+    ...(expensesContent
       ? [
           {
             label: t('expenses'),
+            content: expensesContent,
+          },
+        ]
+      : []),
+    ...(canViewFinancials
+      ? [
+          {
+            label: t('charts'),
             content: sections && (
-              <ExpensesTab
-                expenseBreakdown={sections.expenseBreakdown}
-                cumulativeSpend={sections.cumulativeSpend}
-                formatter={formatValue}
+              <ChartsTab
+                showTimeCharts={showTaskTabs}
+                money={{
+                  projectName: project.name,
+                  profitability: sections.profitability,
+                  budgetVsActual: sections.budgetVsActual,
+                  invoiceProgress: sections.invoiceProgress,
+                  formatter: formatValue,
+                }}
+                time={{
+                  projectName: project.name,
+                  estimatedVsLogged: sections.estimatedVsLogged,
+                  projectHealth: sections.projectHealth,
+                  teamContribution: sections.teamContribution,
+                  timeDistribution: sections.timeDistribution,
+                  velocityTrend: sections.velocityTrend,
+                  formatter: formatValue,
+                }}
+                expenses={{
+                  expenseBreakdown: sections.expenseBreakdown,
+                  cumulativeSpend: sections.cumulativeSpend,
+                  formatter: formatValue,
+                }}
               />
             ),
           },
@@ -317,28 +350,6 @@ export function ProjectAnalytics({
 
   return (
     <section className="my-4 space-y-4">
-      {analytics.isLoading && (
-        <div
-          className="flex min-h-[160px] items-center justify-center rounded-md border"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
-        >
-          <Spinner />
-        </div>
-      )}
-
-      {!analytics.isLoading && !hasAnalyticsData && (
-        <div
-          className="rounded-md border p-4 text-sm"
-          style={{
-            backgroundColor: colors.$1,
-            borderColor: colors.$24,
-            color: colors.$22,
-          }}
-        >
-          {t('no_project_analytics_data')}
-        </div>
-      )}
-
       <TabGroup
         tabs={tabs.map((tab) => tab.label)}
         withoutVerticalMargin

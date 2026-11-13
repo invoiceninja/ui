@@ -15,21 +15,86 @@ import {
 
 resetAccountBeforeAll();
 
+test.use({ timezoneId: 'UTC' });
+
 const TASK_STATUSES = 'task_statuses' as EntityType;
 
 const escapeRegExp = (value: string) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const dateDaysFromNow = (days: number) => {
-  const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+/** Calendar date in UTC (matches Playwright timezoneId and activity_dates windows). */
+const utcCalendarDate = () => {
+  const now = new Date();
 
-  return date.toISOString().slice(0, 10);
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  )
+    .toISOString()
+    .slice(0, 10);
 };
 
-const timestampFor = (date: string, hour: number, minute = 0) => {
-  const [year, month, day] = date.split('-').map(Number);
+const dayBoundsUnix = (taskDate: string) => {
+  const [year, month, day] = taskDate.split('-').map(Number);
 
-  return Math.floor(Date.UTC(year, month - 1, day, hour, minute, 0) / 1000);
+  return {
+    dayStart: Math.floor(Date.UTC(year, month - 1, day, 0, 0, 0) / 1000),
+    dayEnd: Math.floor(Date.UTC(year, month - 1, day, 23, 59, 59) / 1000),
+  };
+};
+
+/** Completed segment on `taskDate` so activity_dates / Daily include the task. */
+const pastTimeLogOnDate = (taskDate: string) => {
+  const now = Math.floor(Date.now() / 1000);
+  const { dayStart, dayEnd } = dayBoundsUnix(taskDate);
+
+  let stop = Math.min(now - 120, dayEnd);
+  let start = stop - 1800;
+
+  if (start < dayStart) {
+    start = dayStart;
+    stop = Math.min(start + 1800, now - 120);
+  }
+
+  if (start >= stop || stop >= now) {
+    throw new Error(
+      `Cannot build past time log on ${taskDate} (now=${now}, dayStart=${dayStart})`
+    );
+  }
+
+  return { start, stop };
+};
+
+/** Time-log segment entirely in the future but still on `taskDate` (UTC). */
+const futureTimeLogOnDate = (taskDate: string) => {
+  const now = Math.floor(Date.now() / 1000);
+  const { dayEnd: endOfDayUnix } = dayBoundsUnix(taskDate);
+
+  let start = now + 3600;
+  let stop = start + 3600;
+
+  if (stop > endOfDayUnix) {
+    start = Math.max(now + 300, endOfDayUnix - 7200);
+    stop = Math.min(start + 3600, endOfDayUnix);
+  }
+
+  if (start <= now || stop <= now) {
+    throw new Error(
+      `Cannot build future time log on ${taskDate} (now=${now}, end=${endOfDayUnix})`
+    );
+  }
+
+  return { start, stop };
+};
+
+/** Past + future segments: Daily sees activity; Start stays hidden (future log). */
+const timeLogWithFutureStartHidden = (taskDate: string) => {
+  const past = pastTimeLogOnDate(taskDate);
+  const future = futureTimeLogOnDate(taskDate);
+
+  return JSON.stringify([
+    [past.start, past.stop, '', true],
+    [future.start, future.stop, '', true],
+  ]);
 };
 
 test('hides Start controls for tasks with future time logs', async ({
@@ -42,17 +107,15 @@ test('hides Start controls for tasks with future time logs', async ({
   const suffix = Date.now().toString(36).slice(-6);
   const status = await createTaskStatus(api, `future-start-${suffix}`, 1);
   const description = `future-start-${suffix}`;
-  const futureDate = dateDaysFromNow(7);
-  const futureStart = timestampFor(futureDate, 9);
-  const futureStop = futureStart + 3600;
+  const taskDate = utcCalendarDate();
   const task = await createTaskFromBlank(api, {
     client_id: client.id,
     status_id: status.id,
     description,
     is_date_based: true,
-    date: futureDate,
-    calculated_start_date: futureDate,
-    time_log: JSON.stringify([[futureStart, futureStop, '', true]]),
+    date: taskDate,
+    calculated_start_date: taskDate,
+    time_log: timeLogWithFutureStartHidden(taskDate),
   });
 
   await login(page);
@@ -61,7 +124,8 @@ test('hides Start controls for tasks with future time logs', async ({
   await expectTaskBulkActionStartHidden(page, description);
   await expectTaskSliderActionStartHidden(page, description);
   await expectTaskEditStartHidden(page, task.id);
-  await expectDailyStartHidden(page, description, task.date ?? futureDate);
+  // Daily uses activity_dates from time-log UTC windows; persisted task.date may differ (company TZ).
+  await expectDailyStartHidden(page, description, taskDate);
   await expectKanbanStartHidden(page, description);
 });
 
@@ -122,13 +186,22 @@ async function expectDailyStartHidden(
   description: string,
   date: string
 ) {
+  const tasksLoaded = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/v1/tasks') &&
+      response.url().includes('activity_dates') &&
+      response.status() === 200,
+    { timeout: 15000 }
+  );
+
   await page.goto(`/tasks/daily?date=${date}`);
   await page.waitForURL(`**/tasks/daily?date=${date}`);
+  await tasksLoaded;
 
   const main = page.getByRole('main');
-  await expect(main.getByText(description, { exact: true })).toBeVisible({
-    timeout: 10000,
-  });
+  const taskLabel = main.getByText(description, { exact: true }).first();
+
+  await expect(taskLabel).toBeVisible({ timeout: 10000 });
   await expect(main.getByRole('button', { name: 'Start', exact: true })).not.toBeVisible();
 }
 

@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { route } from '$app/common/helpers/route';
@@ -56,7 +57,7 @@ export default function PurchaseOrder() {
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
-      name: t('edit_purchase_order'),
+      name: numberBreadcrumb(data?.number, t('edit_purchase_order')),
       href: route('/purchase_orders/:id/edit', { id }),
     },
   ];

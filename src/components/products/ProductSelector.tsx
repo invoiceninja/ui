@@ -35,6 +35,8 @@ interface Props {
   withoutAction?: boolean;
   clearInputAfterSelection?: boolean;
   withShadow?: boolean;
+  nullable?: boolean;
+  exclude?: string[];
 }
 
 export function ProductSelector(props: Props) {
@@ -112,10 +114,11 @@ export function ProductSelector(props: Props) {
         }}
         onDismiss={props.onClearButtonClick}
         sortBy="product_key|asc"
-        nullable
+        nullable={props.nullable ?? true}
         key="product_selector"
         clearInputAfterSelection={props.clearInputAfterSelection}
         withShadow={props.withShadow}
+        exclude={props.exclude}
       />
 
       <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>

@@ -10,6 +10,7 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from '$app/common/colors';
 import { Element } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
@@ -27,6 +28,7 @@ export function SendTimeModal({
   onConfirm,
 }: SendTimeModalProps) {
   const [t] = useTranslation();
+  const colors = useColorScheme();
 
   const [syncEnabled, setSyncEnabled] = useState<boolean>(false);
 
@@ -51,7 +53,7 @@ export function SendTimeModal({
             />
           </Element>
 
-          <span className="text-sm text-gray-500">
+          <span className="text-sm" style={{ color: colors.$22 }}>
             {t('sync_send_time_help')}
           </span>
         </div>

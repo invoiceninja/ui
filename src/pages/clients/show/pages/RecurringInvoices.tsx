@@ -55,6 +55,7 @@ export default function RecurringInvoices() {
       hideEditableOptions={!hasPermission('edit_recurring_invoice')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }

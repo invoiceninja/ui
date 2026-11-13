@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
@@ -49,15 +50,15 @@ export default function Edit() {
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
 
+  const { data, isLoading } = useQuoteQuery({ id: id! });
+
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
     {
-      name: t('edit_quote'),
+      name: numberBreadcrumb(data?.number, t('edit_quote')),
       href: route('/quotes/:id/edit', { id }),
     },
   ];
-
-  const { data, isLoading } = useQuoteQuery({ id: id! });
 
   const [quote, setQuote] = useAtomWithPrevent(quoteAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);

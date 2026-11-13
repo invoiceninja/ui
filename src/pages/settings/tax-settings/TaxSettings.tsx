@@ -22,7 +22,6 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
-import { HelpWidget } from '$app/components/HelpWidget';
 import { Card, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
 import { Settings } from '../../../components/layouts/Settings';
@@ -210,11 +209,6 @@ export function TaxSettings() {
       )}
 
       <TaxRates />
-
-      <HelpWidget
-        id="calculate-taxes"
-        url="https://raw.githubusercontent.com/invoiceninja/invoiceninja.github.io/refs/heads/v5-rework/docs/user-guide/taxes.mdx"
-      />
     </Settings>
   );
 }

@@ -17,19 +17,13 @@ import { Provider } from 'react-redux';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { ScrollToTop } from '$app/components/ScrollToTop';
 import { App } from './App';
+import { readEmbedFlag, waitForHostInit } from './common/helpers/embed';
 import { initializeSentry } from './common/sentry';
 import { store } from './common/stores/store';
 
 import './resources/css/app.css';
 
-import { loader } from '@monaco-editor/react';
 import mitt from 'mitt';
-import * as monaco from 'monaco-editor';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 import { Events } from './common/events';
 import { GoogleOAuth } from './components/GoogleOAuth';
 import { ReactQueryDevtoolsPanel } from './components/ReactQueryDevtoolsPanel';
@@ -63,31 +57,15 @@ const queryClient = new QueryClient({
   },
 });
 
-(self as any).MonacoEnvironment = {
-  getWorker(_: any, label: string) {
-    if (label === 'json') {
-      return new jsonWorker();
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return new cssWorker();
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return new htmlWorker();
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return new tsWorker();
-    }
-    return new editorWorker();
-  },
-};
-
-loader.config({ monaco });
-
-loader.init().then(/* ... */);
-
 const container = document.getElementById('root') as HTMLElement;
 
 async function bootstrap() {
+  // Embedded in the Invoice Ninja app: sign in with the token it hands over
+  // before anything renders or requests.
+  if (readEmbedFlag()) {
+    await waitForHostInit();
+  }
+
   try {
     await initializeSentry();
   } catch (error) {

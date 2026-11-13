@@ -9,9 +9,11 @@
  */
 
 import { darkBuilderTheme, Sign, SignContext } from '@docuninja/builder2.0';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { useColorScheme } from '$app/common/colors';
+import { isEmbedded, postToHost } from '$app/common/helpers/embed';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export default function Index() {
@@ -21,6 +23,25 @@ export default function Index() {
   const reactSettings = useReactSettings();
 
   const [t, i18n] = useTranslation();
+
+  // Embedded in the Invoice Ninja app (`common/helpers/embed.ts`): the page
+  // is up, and later the signature landed, so the app can refresh the
+  // document and close.
+  useEffect(() => {
+    if (!isEmbedded()) {
+      return;
+    }
+
+    postToHost('loaded', { documentId: params.document });
+
+    const onSigned = () =>
+      postToHost('signed', { documentId: params.document });
+
+    window.addEventListener('builder:sign.submit.success', onSigned);
+
+    return () =>
+      window.removeEventListener('builder:sign.submit.success', onSigned);
+  }, [params.document]);
 
   return (
     <div className="max-w-[90rem] mx-auto">

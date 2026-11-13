@@ -33,17 +33,17 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
 
+  const { data } = usePaymentTermQuery({ id });
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('payment_settings'), href: '/settings/online_payments' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     {
-      name: t('edit_payment_term'),
+      name: data?.data.data.name || t('edit_payment_term'),
       href: route('/settings/payment_terms/:id/edit', { id }),
     },
   ];
-
-  const { data } = usePaymentTermQuery({ id });
 
   const invalidatePaymentTermCache = () => {
     $refetch(['payment_terms']);

@@ -11,6 +11,7 @@
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { usePurchaseOrderQuery } from '$app/common/queries/purchase-orders';
@@ -39,7 +40,7 @@ export default function Email() {
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
-      name: t('purchase_order'),
+      name: numberBreadcrumb(purchaseOrder?.number, t('edit_purchase_order')),
       href: route('/purchase_orders/:id', { id }),
     },
     {

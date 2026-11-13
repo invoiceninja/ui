@@ -51,6 +51,14 @@ export const PROJECT_BURNUP_METRICS: ProjectBurnupMetricDefinition[] = [
     strokeDasharray: '8 5',
   },
   {
+    key: 'task_estimated_hours',
+    axis: 'hours',
+    translationKey: 'estimated_hours',
+    stroke: '#d97706',
+    strokeDasharray: '12 4',
+    strokeWidth: 2.5,
+  },
+  {
     key: 'cumulative_task_value',
     axis: 'money',
     translationKey: 'billable',
@@ -118,6 +126,7 @@ export const DEFAULT_PROJECT_BURNUP_METRICS: ProjectBurnupMetricKey[] = [
   'cumulative_logged_hours',
   'budgeted_hours',
   'ideal_hours',
+  'task_estimated_hours',
   'cumulative_invoiced_amount',
   'cumulative_paid_to_date',
   'cumulative_expense_amount',

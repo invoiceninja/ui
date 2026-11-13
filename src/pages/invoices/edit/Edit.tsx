@@ -45,6 +45,10 @@ import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
+import {
+  InvoicePayment,
+  InvoicePaymentParams,
+} from '../common/components/InvoicePayment';
 import { InvoicePreview } from '../common/components/InvoicePreview';
 import { InvoiceStatus as InvoiceStatusBadge } from '../common/components/InvoiceStatus';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
@@ -54,6 +58,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { TaxDataBadge } from './components/TaxDataBadge';
+import { useDefaultTabIndex } from '$app/common/hooks/useDefaultTabIndex';
 
 export interface Context {
   invoice: Invoice | undefined;
@@ -64,6 +69,8 @@ export interface Context {
   setIsDefaultFooter: Dispatch<SetStateAction<boolean>>;
   errors: ValidationBag | undefined;
   client: Client | undefined;
+  payment: InvoicePaymentParams | undefined;
+  setPayment: Dispatch<SetStateAction<InvoicePaymentParams | undefined>>;
 }
 
 export default function Edit() {
@@ -83,11 +90,14 @@ export default function Edit() {
     setIsDefaultFooter,
     errors,
     client,
+    payment,
+    setPayment,
   } = context;
 
   const taskColumns = useTaskColumns();
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
+  const { defaultTabIndex } = useDefaultTabIndex(invoice);
 
   useScrollToLineItem(Boolean(invoice && client));
 
@@ -261,7 +271,7 @@ export default function Edit() {
 
           <TabGroup
             tabs={[t('products'), t('tasks')]}
-            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+            defaultTabIndex={defaultTabIndex}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={invoice?.line_items || []} />;
@@ -345,7 +355,13 @@ export default function Edit() {
             onChange={(property, value) =>
               handleChange(property, value as string)
             }
-          />
+          >
+            <InvoicePayment
+              invoice={invoice}
+              payment={payment}
+              setPayment={setPayment}
+            />
+          </InvoiceTotals>
         )}
       </div>
 

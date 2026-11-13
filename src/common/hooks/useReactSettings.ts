@@ -26,6 +26,7 @@ import { Entity } from '$app/components/CommonActionsPreferenceModal';
 import { PerPage } from '$app/components/DataTable';
 import { ClientShowCard } from '$app/pages/clients/show/components/CardsCustomizationModal';
 import { ThemeColorField } from '$app/pages/settings/user/components/StatusColorTheme';
+import { DEFAULT_TAB, type DefaultTab } from '../constants/default-tab';
 import { Record as ClientMapRecord } from '../constants/exports/client-map';
 import {
   KeyboardShortcutOverride,
@@ -40,6 +41,8 @@ export type { KeyboardShortcutOverride };
 export { resolveShortcutBindings };
 
 export type ChartsDefaultView = 'day' | 'week' | 'month';
+
+export type DurationFormat = 'decimal' | 'hh_mm';
 
 export interface TableFiltersPreference {
   filter?: string;
@@ -70,10 +73,12 @@ export interface Preferences {
   };
   keyboard_shortcuts?: Record<string, KeyboardShortcutOverride | null>;
   auto_expand_product_table_notes: boolean;
+  default_tab: DefaultTab;
   enable_public_notifications: boolean | null;
   use_system_fonts: boolean;
   use_legacy_editor: boolean;
   hide_peppol_sent_status: boolean;
+  duration_format?: DurationFormat;
   feedback_slider_displayed_at: number;
   feedback_given_at: number;
   price_increase_banner_dismissed_at?: number;
@@ -105,6 +110,7 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
+  show_advanced_invoice_editor?: boolean;
 }
 
 export type ReactTableColumns =
@@ -140,10 +146,12 @@ export const preferencesDefaults: Preferences = {
     columns: {},
   },
   auto_expand_product_table_notes: false,
+  default_tab: DEFAULT_TAB,
   enable_public_notifications: null,
   use_system_fonts: false,
   use_legacy_editor: false,
   hide_peppol_sent_status: false,
+  duration_format: 'decimal',
   feedback_slider_displayed_at: 0,
   feedback_given_at: 0,
   price_increase_banner_dismissed_at: 0,

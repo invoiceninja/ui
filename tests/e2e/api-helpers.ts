@@ -382,19 +382,28 @@ interface ApiUser {
 
 async function fetchAllUsers(api: ApiContext): Promise<ApiUser[]> {
   const context = await apiRequest(api);
-  const response = await context.get(
-    '/api/v1/users?per_page=100&include_deleted=true',
-    { headers: api.headers }
-  );
+  const users: ApiUser[] = [];
 
-  if (!response.ok()) {
+  try {
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const response = await context.get(
+        `/api/v1/users?per_page=100&include_deleted=true&page=${page}`,
+        { headers: api.headers }
+      );
+      if (!response.ok()) {
+        throw new Error(`Failed to fetch users (${response.status()})`);
+      }
+      const body = await response.json();
+      users.push(...(body.data || []));
+      totalPages = body.meta?.pagination?.total_pages ?? 1;
+      page += 1;
+    } while (page <= totalPages);
+    return users;
+  } finally {
     await context.dispose();
-    return [];
   }
-
-  const body = await response.json();
-  await context.dispose();
-  return body.data || [];
 }
 
 /**
@@ -494,13 +503,14 @@ const CLEAN_USER_REACT_SETTINGS = {
  * The preferences endpoint only authorizes `auth()->id === route user id`;
  * updating any other user returns 401.
  */
-export async function resetUserReactSettings(
+export async function updateUserReactSettings(
   api: ApiContext,
+  patch: Record<string, unknown>,
   options?: { quiet?: boolean }
 ): Promise<void> {
   if (!api.userId) {
     throw new Error(
-      'Cannot reset react settings: login response did not include user.id'
+      'Cannot update react settings: login response did not include user.id'
     );
   }
 
@@ -511,23 +521,47 @@ export async function resetUserReactSettings(
       `/api/v1/company_users/${api.userId}/preferences`,
       {
         headers: api.headers,
-        data: { react_settings: CLEAN_USER_REACT_SETTINGS },
+        data: {
+          react_settings: {
+            ...CLEAN_USER_REACT_SETTINGS,
+            ...patch,
+          },
+        },
       }
     );
 
     if (!update.ok()) {
       throw new Error(
-        `Failed to reset react settings (${update.status()}): ${(
+        `Failed to update react settings (${update.status()}): ${(
           await update.text()
         ).slice(0, 200)}`
       );
     }
 
     if (!options?.quiet) {
-      e2eLog('  Reset react settings');
+      e2eLog('  Updated react settings');
     }
   } finally {
     await context.dispose();
+  }
+}
+
+export async function setUserDarkMode(
+  api: ApiContext,
+  enabled: boolean,
+  options?: { quiet?: boolean }
+): Promise<void> {
+  await updateUserReactSettings(api, { dark_mode: enabled }, options);
+}
+
+export async function resetUserReactSettings(
+  api: ApiContext,
+  options?: { quiet?: boolean }
+): Promise<void> {
+  await updateUserReactSettings(api, {}, options);
+
+  if (!options?.quiet) {
+    e2eLog('  Reset react settings');
   }
 }
 
@@ -674,6 +708,57 @@ export async function ensurePermissionUserExists(
     `  Created missing user ${email} (${derivedFirst} ${derivedLast})`
   );
   return userId;
+}
+
+export type ColumnFilterUser = Pick<
+  ApiUser,
+  'id' | 'first_name' | 'last_name' | 'email'
+>;
+
+/** Label shown in User / Assigned User column filter options. */
+export function formatUserLabel(user: ColumnFilterUser): string {
+  return user.first_name || user.last_name
+    ? `${user.first_name} ${user.last_name}`.trim()
+    : user.email;
+}
+
+/**
+ * Owner plus a distinct second user for column filter tests. Creates or restores
+ * the lane-scoped permissions user when missing (same as account reset).
+ */
+export async function ensureColumnFilterUsers(
+  api: ApiContext
+): Promise<{ owner: ColumnFilterUser; other: ColumnFilterUser }> {
+  const ownerId = api.userId;
+  if (!ownerId) {
+    throw new Error('API context is missing userId (owner login)');
+  }
+
+  const otherEmail = emailForCurrentAccount('permissions@example.com');
+  const otherId = await ensurePermissionUserExists(api, otherEmail);
+
+  const users = await fetchAllUsers(api);
+  const owner = users.find((user) => user.id === ownerId && !user.is_deleted);
+  const other = users.find((user) => user.id === otherId && !user.is_deleted);
+
+  if (!owner) {
+    throw new Error(`Active owner user ${ownerId} not found in company`);
+  }
+  if (!other) {
+    throw new Error(
+      `Active permissions user ${otherEmail} not found after ensure`
+    );
+  }
+
+  const ownerLabel = formatUserLabel(owner);
+  const otherLabel = formatUserLabel(other);
+  if (ownerLabel === otherLabel) {
+    throw new Error(
+      `Owner and permissions user share filter label "${ownerLabel}"`
+    );
+  }
+
+  return { owner, other };
 }
 
 // ---------------------------------------------------------------------------

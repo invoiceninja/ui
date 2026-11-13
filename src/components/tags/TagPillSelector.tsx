@@ -20,6 +20,7 @@ import { randomTagColor } from '$app/common/helpers/tags';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { $refetch } from '$app/common/hooks/useRefetch';
+import { useValidateTagName } from '$app/common/hooks/useValidateTagName';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Tag, TagEntityType } from '$app/common/interfaces/tag';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -48,10 +49,12 @@ export function TagPillSelector(props: Props) {
   const [t] = useTranslation();
   const colors = useColorScheme();
   const { isAdmin } = useAdmin();
+  const validateTagName = useValidateTagName();
 
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [errors, setErrors] = useState<ValidationBag>();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { data, isLoading, refetch } = useTagsQuery({
@@ -91,6 +94,7 @@ export function TagPillSelector(props: Props) {
   useClickAway(containerRef, () => setIsOpen(false));
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setErrors(undefined);
     setQuery(event.target.value);
     setIsOpen(true);
   };
@@ -110,7 +114,18 @@ export function TagPillSelector(props: Props) {
       return;
     }
 
+    const validationErrors = validateTagName(tagName);
+
+    if (validationErrors) {
+      setErrors(validationErrors);
+      setIsOpen(false);
+
+      return;
+    }
+
     toast.processing();
+
+    setErrors(undefined);
     setIsCreating(true);
 
     request('POST', endpoint('/api/v1/tags'), {
@@ -130,6 +145,8 @@ export function TagPillSelector(props: Props) {
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          setIsOpen(false);
           toast.dismiss();
         }
       })
@@ -244,7 +261,9 @@ export function TagPillSelector(props: Props) {
         )}
       </div>
 
-      <ErrorMessage className="mt-2">{props.errorMessage}</ErrorMessage>
+      <ErrorMessage className="mt-2">
+        {errors?.errors.name ?? props.errorMessage}
+      </ErrorMessage>
     </div>
   );
 }

@@ -61,12 +61,12 @@ import {
   MdPrint,
   MdRestore,
   MdSchedule,
-  MdSend,
 } from 'react-icons/md';
 import { Icon } from '$app/components/icons/Icon';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
@@ -85,6 +85,7 @@ import {
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { CloneOptionsModal } from './components/CloneOptionsModal';
+import { EmailCreditAction } from './components/EmailCreditAction';
 import { useFormatCustomFieldValue } from '$app/common/hooks/useFormatCustomFieldValue';
 import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { useChangeTemplate } from '$app/pages/settings/invoice-design/pages/custom-designs/components/ChangeTemplate';
@@ -102,6 +103,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { normalizeColumnName } from '$app/common/helpers/data-table';
 import { useDisplayRunTemplateActions } from '$app/common/hooks/useDisplayRunTemplateActions';
 import { TagPills } from '$app/components/tags/TagPills';
+import { PeppolSendingStatus } from '$app/components/e-invoice/PeppolSendingStatus';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -556,19 +558,13 @@ export function useActions(params?: Params) {
       />
     ),
     (credit) => (
-      <EntityActionElement
+      <EmailCreditAction
         {...(!dropdown && {
           key: 'email_credit',
         })}
-        entity="credit"
-        actionKey="email_credit"
-        isCommonActionSection={!dropdown}
-        tooltipText={t('email_credit')}
-        to={route('/credits/:id/email', { id: credit.id })}
-        icon={MdSend}
-      >
-        {t('email_credit')}
-      </EntityActionElement>
+        credit={credit}
+        isDropdown={dropdown}
+      />
     ),
     (credit) => (
       <EntityActionElement
@@ -766,7 +762,7 @@ export function useAllCreditColumns() {
     'date',
     'remaining',
     'archived_at',
-    // 'assigned_to', @Todo: Need to resolve relationship
+    'assigned_user',
     'client_city',
     'client_country',
     'client_postal_code',
@@ -774,7 +770,7 @@ export function useAllCreditColumns() {
     'contact_email',
     'contact_name',
     'created_at',
-    // 'created_by', @Todo: Need to resolve relationship
+    'user',
     firstCustom,
     secondCustom,
     thirdCustom,
@@ -815,6 +811,7 @@ export function useCreditColumns() {
   const formatMoney = useFormatMoney();
   const reactSettings = useReactSettings();
   const resolveCountry = useResolveCountry();
+  const resolveUserName = useResolveUserName();
   const formatCustomFieldValue = useFormatCustomFieldValue();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
@@ -827,7 +824,13 @@ export function useCreditColumns() {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (_value, credit) => <CreditStatusBadge entity={credit} />,
+      format: (_value, credit) => (
+        <div className="flex items-center gap-x-2">
+          <CreditStatusBadge entity={credit} />
+
+          <PeppolSendingStatus entity="credit" resource={credit} />
+        </div>
+      ),
     },
     {
       column: 'number',
@@ -1123,6 +1126,18 @@ export function useCreditColumns() {
       id: 'due_date',
       label: t('valid_until'),
       format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'user',
+      id: 'user_id',
+      label: t('user'),
+      format: (value, credit) => resolveUserName(credit.user_id),
+    },
+    {
+      column: 'assigned_user',
+      id: 'assigned_user_id',
+      label: t('assigned_user'),
+      format: (value, credit) => resolveUserName(credit.assigned_user_id),
     },
     {
       column: 'tags',

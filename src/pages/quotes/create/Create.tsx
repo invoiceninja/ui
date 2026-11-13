@@ -143,6 +143,10 @@ export default function Create() {
           _quote.client_id = searchParams.get('client')!;
         }
 
+        if (searchParams.get('project_id')) {
+          _quote.project_id = searchParams.get('project_id')!;
+        }
+
         _quote.uses_inclusive_taxes =
           company?.settings?.inclusive_taxes ?? false;
 

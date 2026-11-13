@@ -2,8 +2,8 @@ import {
   type AuthoredDocumentData,
   Builder as Builder$,
   BuilderContext,
-  darkBuilderTheme,
   blobToBase64,
+  darkBuilderTheme,
 } from '@docuninja/builder2.0';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +15,9 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { Blueprint } from '$app/common/interfaces/docuninja/blueprints';
 import { useBlueprintQuery } from '$app/common/queries/docuninja/blueprints';
@@ -27,6 +27,7 @@ import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { ImportFromGoogleDrive } from '$app/pages/documents/builder/google-drive';
+import { useEmbeddedBuilderEvents } from '$app/pages/documents/builder/useEmbeddedBuilderEvents';
 import { useActions } from '../common/hooks/useActions';
 import { EditBlueprintModal } from '../edit/components/EditBlueprintModal';
 import { SignatorySelector, SignatorySwap } from './Elements';
@@ -48,6 +49,10 @@ function BlueprintBuilder() {
   const colors = useColorScheme();
 
   const { data: blueprintResponse } = useBlueprintQuery({ id });
+
+  // Embedded in the Invoice Ninja app: the same events as the document
+  // builder (`common/helpers/embed.ts`).
+  useEmbeddedBuilderEvents(id);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDocumentSaving, setIsDocumentSaving] = useState<boolean>(false);

@@ -17,7 +17,7 @@ export function TaxDataBadge({ resource }: Props) {
 
   if (
     !resource ||
-    currentCompany?.settings.country_id !== '840' ||
+    resource.client?.country_id !== '840' ||
     !currentCompany?.calculate_taxes
   ) {
     return null;
@@ -37,6 +37,7 @@ export function TaxDataBadge({ resource }: Props) {
           resourceId={resource.client?.id as string}
           resourceType="client"
           taxData={resource.client?.tax_info}
+          clientCountryId={resource.client?.country_id}
           refetchInvoices
         />
       )}

@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useAtomWithPrevent } from '$app/common/hooks/useAtomWithPrevent';
@@ -44,6 +45,7 @@ import { EInvoiceComponent } from '../settings';
 import { useCheckEInvoiceValidation } from '../settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
 import { invoiceAtom } from './common/atoms';
 import { AddUninvoicedItemsButton } from './common/components/AddUninvoicedItemsButton';
+import { InvoicePaymentParams } from './common/components/InvoicePayment';
 import { useTabs } from './common/hooks/useTabs';
 import { useInvoiceUtilities } from './create/hooks/useInvoiceUtilities';
 import { useActions } from './edit/components/Actions';
@@ -98,6 +100,7 @@ export default function Invoice() {
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
   const [isDefaultTerms, setIsDefaultTerms] = useState<boolean>(false);
   const [isDefaultFooter, setIsDefaultFooter] = useState<boolean>(false);
+  const [payment, setPayment] = useState<InvoicePaymentParams>();
 
   const save = useHandleSave({
     setErrors,
@@ -105,6 +108,8 @@ export default function Invoice() {
     isDefaultFooter,
     isFormBusy,
     setIsFormBusy,
+    payment,
+    setPayment,
   });
 
   const tabs = useTabs({
@@ -114,7 +119,10 @@ export default function Invoice() {
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
-    { name: t('edit_invoice'), href: route('/invoices/:id/edit', { id }) },
+    {
+      name: numberBreadcrumb(data?.number, t('edit_invoice')),
+      href: route('/invoices/:id/edit', { id }),
+    },
   ];
 
   useEffect(() => {
@@ -125,7 +133,9 @@ export default function Invoice() {
     if (currentInvoice) {
       const _invoice = cloneDeep(currentInvoice);
 
-      _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
+      _invoice.line_items.map(
+        (lineItem) => (lineItem._id = lineItem._id || v4())
+      );
 
       setInvoice(_invoice);
 
@@ -134,6 +144,10 @@ export default function Invoice() {
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    setPayment(undefined);
+  }, [id]);
 
   useEffect(() => {
     invoice && calculateInvoiceSum(invoice);
@@ -252,6 +266,8 @@ export default function Invoice() {
                   eInvoiceValidationEntityResponse: validationResponse,
                   triggerValidationQuery,
                   setTriggerValidationQuery,
+                  payment,
+                  setPayment,
                 }}
               />
             </div>

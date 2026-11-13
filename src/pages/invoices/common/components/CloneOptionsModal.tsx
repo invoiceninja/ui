@@ -10,11 +10,13 @@
 
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -43,6 +45,7 @@ interface Props {
 }
 
 export function CloneOptionsModal(props: Props) {
+  const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
   const navigate = useNavigate();
 
@@ -63,7 +66,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToInvoice = () => {
     setInvoice({
-      ...invoice,
+      ...cloneDeep(invoice),
       id: '',
       number: '',
       documents: [],
@@ -81,12 +84,12 @@ export function CloneOptionsModal(props: Props) {
       client: undefined,
     });
 
-    navigate('/invoices/create?action=clone');
+    navigate(`${invoicePaths.create}?action=clone`);
   };
 
   const cloneToQuote = () => {
     setQuote({
-      ...(invoice as unknown as Quote),
+      ...(cloneDeep(invoice) as unknown as Quote),
       id: '',
       number: '',
       documents: [],
@@ -122,7 +125,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToRecurringInvoice = () => {
     setRecurringInvoice({
-      ...(invoice as unknown as RecurringInvoice),
+      ...(cloneDeep(invoice) as unknown as RecurringInvoice),
       id: '',
       number: '',
       documents: [],
@@ -146,7 +149,7 @@ export function CloneOptionsModal(props: Props) {
 
   const cloneToPurchaseOrder = () => {
     setPurchaseOrder({
-      ...(invoice as unknown as PurchaseOrder),
+      ...(cloneDeep(invoice) as unknown as PurchaseOrder),
       id: '',
       number: '',
       documents: [],

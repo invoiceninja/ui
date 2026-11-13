@@ -44,21 +44,6 @@ function Edit() {
 
   const actions = useActions();
 
-  const pages = [
-    {
-      name: t('docuninja'),
-      href: '/docuninja',
-    },
-    {
-      name: t('users'),
-      href: '/docuninja/users',
-    },
-    {
-      name: t('edit_user'),
-      href: route('/docuninja/users/:id/edit', { id }),
-    },
-  ];
-
   const [user, setUser] = useState<User>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -77,6 +62,26 @@ function Edit() {
   const { data: userResponse, isLoading } = useDocuNinjaUserQuery({
     id,
   });
+
+  const pages = [
+    {
+      name: t('docuninja'),
+      href: '/docuninja',
+    },
+    {
+      name: t('users'),
+      href: '/docuninja/users',
+    },
+    {
+      name:
+        [userResponse?.first_name, userResponse?.last_name]
+          .filter(Boolean)
+          .join(' ') ||
+        userResponse?.email ||
+        t('edit_user'),
+      href: route('/docuninja/users/:id/edit', { id }),
+    },
+  ];
 
   const handleUpdate = () => {
     if (!isFormBusy) {

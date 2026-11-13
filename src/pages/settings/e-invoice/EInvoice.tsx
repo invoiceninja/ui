@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { activeSettingsAtom } from '$app/common/atoms/settings';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { whiteLabelPlan } from '$app/common/guards/guards/white-label';
 import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
@@ -127,7 +128,10 @@ export function EInvoice() {
   const disableSettingsField = useDisableSettingsField();
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
-  const { isCompanySettingsActive } = useCurrentSettingsLevel();
+  const { isCompanySettingsActive, isClientSettingsActive } =
+    useCurrentSettingsLevel();
+
+  const activeSettings = useAtomValue(activeSettingsAtom);
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -216,6 +220,24 @@ export function EInvoice() {
       setSaveChanges(false);
     }
   }, [saveChanges]);
+
+  if (isClientSettingsActive) {
+    return (
+      <Settings
+        title={t('e_invoicing')}
+        docsLink="en/advanced-settings/#e_invoice"
+        breadcrumbs={pages}
+        onSaveClick={() => eInvoiceRef?.current?.saveEInvoice()}
+      >
+        <PaymentMeans
+          ref={eInvoiceRef}
+          entity="client"
+          entityId={activeSettings?.id}
+          currentEInvoice={company?.e_invoice || {}}
+        />
+      </Settings>
+    );
+  }
 
   return (
     <Settings
@@ -475,7 +497,10 @@ export function EInvoice() {
                               <CloudUpload size="2.3rem" color={colors.$3} />
                             </div>
 
-                            <span className="mt-2 block text-sm font-medium text-gray-900">
+                            <span
+                              className="mt-2 block text-sm font-medium"
+                              style={{ color: colors.$3 }}
+                            >
                               {isDragActive
                                 ? 'upload_certificate'
                                 : t('dropzone_default_message')}

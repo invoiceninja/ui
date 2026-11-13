@@ -117,7 +117,7 @@ export function ConnectAccounts() {
                 className="flex items-center justify-center space-x-2 text-xs pb-3"
                 onClick={(event) => event.stopPropagation()}
               >
-                <p className="text-gray-500">{t('yodlee_regions')}.</p>
+                <p style={{ color: colors.$22 }}>{t('yodlee_regions')}.</p>
 
                 <Link
                   className="text-xs"
@@ -148,7 +148,7 @@ export function ConnectAccounts() {
                 className="flex items-center justify-center space-x-2 text-xs pb-3"
                 onClick={(event) => event.stopPropagation()}
               >
-                <p className="text-gray-500">{t('nordigen_regions')}.</p>
+                <p style={{ color: colors.$22 }}>{t('nordigen_regions')}.</p>
 
                 <Link
                   className="text-xs"

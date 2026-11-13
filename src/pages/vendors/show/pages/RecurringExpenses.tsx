@@ -45,6 +45,7 @@ export default function RecurringExpenses() {
       hideEditableOptions={!hasPermission('edit_recurring_expense')}
       withoutPageAsPreference
       withRecordScopedFilters
+      recordScopeId={id}
     />
   );
 }

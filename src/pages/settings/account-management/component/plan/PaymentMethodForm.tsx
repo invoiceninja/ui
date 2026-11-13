@@ -1,3 +1,4 @@
+import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { wait } from '$app/common/helpers/wait';
 import type { GatewayToken as ClientGatewayToken } from '$app/common/interfaces/client';
@@ -75,6 +76,7 @@ export function PaymentMethodForm({
   onCancel,
 }: PaymentProps) {
   const { t } = useTranslation();
+  const colors = useColorScheme();
   const isDestroyed = useRef(false);
 
   const queryClient = useQueryClient();
@@ -421,7 +423,9 @@ export function PaymentMethodForm({
   return (
     <div className="pl-4 pr-4">
       <div className="text-lg font-semibold">
-        <p className="text-sm text-gray-500">{t('payment_amount')}</p>
+        <p className="text-sm" style={{ color: colors.$22 }}>
+          {t('payment_amount')}
+        </p>
         <p className="text-lg font-semibold">{amount_string}</p>
       </div>
 
@@ -444,10 +448,11 @@ export function PaymentMethodForm({
                     }
                                         ${
                                           checked
-                                            ? 'bg-gray-50 border-primary border-2'
-                                            : 'bg-white border border-gray-200'
+                                            ? 'border-primary border-2'
+                                            : 'border border-gray-200'
                                         }
                                         relative flex cursor-pointer rounded-lg px-5 py-4 shadow-sm focus:outline-none`}
+                    style={{ backgroundColor: checked ? colors.$4 : colors.$1 }}
                   >
                     <div className="flex w-full items-center justify-between">
                       <div className="flex items-center">
@@ -455,11 +460,8 @@ export function PaymentMethodForm({
                           <div className="flex items-center space-x-2">
                             <Icon element={MdCreditCard} size={16} />
                             <span
-                              className={
-                                checked
-                                  ? 'text-primary font-medium'
-                                  : 'text-gray-900'
-                              }
+                              className={checked ? 'font-medium' : ''}
+                              style={{ color: colors.$3 }}
                             >
                               {token.meta.brand} ending in {token.meta.last4}
                               {token.is_default && ' (Default)'}
@@ -507,20 +509,18 @@ export function PaymentMethodForm({
                   }
                                     ${
                                       checked
-                                        ? 'bg-gray-50 border-primary border-2'
-                                        : 'bg-white border border-gray-200'
+                                        ? 'border-primary border-2'
+                                        : 'border border-gray-200'
                                     }
                                     relative flex cursor-pointer rounded-lg px-5 py-4 shadow-sm focus:outline-none`}
+                  style={{ backgroundColor: checked ? colors.$4 : colors.$1 }}
                 >
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center">
                       <div className="text-sm">
                         <span
-                          className={
-                            checked
-                              ? 'text-primary font-medium'
-                              : 'text-gray-900'
-                          }
+                          className={checked ? 'font-medium' : ''}
+                          style={{ color: colors.$3 }}
                         >
                           {t('add_payment_method')}
                         </span>

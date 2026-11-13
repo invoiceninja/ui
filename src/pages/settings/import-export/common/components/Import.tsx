@@ -11,14 +11,13 @@
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useColorScheme } from '$app/common/colors';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { ErrorMessage } from '$app/components/ErrorMessage';
-import { SelectField } from '$app/components/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { UploadImport } from './UploadImport';
 
 const FILE_KEY = {
@@ -52,8 +51,6 @@ export interface ImportedFile {
 }
 export function Import() {
   const [t] = useTranslation();
-
-  const colors = useColorScheme();
 
   const [importType, setImportType] = useState<ImportType>('freshbooks');
 
@@ -106,20 +103,11 @@ export function Import() {
   }, [importType]);
 
   return (
-    <Card
-      title={t('import')}
-      className="shadow-sm"
-      saveButtonLabel={t('import')}
-      onSaveClick={(event) => {
-        event.preventDefault();
-        handleImportFiles();
-      }}
-      disableSubmitButton={disableSubmitButton() || isFormBusy}
-      withSaveButton
-      disableWithoutIcon
-      style={{ borderColor: colors.$24 }}
-      headerStyle={{ borderColor: colors.$20 }}
-    >
+    <>
+      <div className="px-4 sm:px-6 pt-2 pb-1">
+        <h3 className="leading-6 font-medium text-lg">{t('import')}</h3>
+      </div>
+
       <Element leftSide={t('import_type')}>
         <SelectField
           value={importType}
@@ -150,6 +138,17 @@ export function Import() {
               )
           )}
       </Element>
-    </Card>
+
+      <div className="px-4 sm:px-6 py-4 flex justify-end">
+        <Button
+          behavior="button"
+          onClick={handleImportFiles}
+          disabled={disableSubmitButton() || isFormBusy}
+          disableWithoutIcon
+        >
+          {t('import')}
+        </Button>
+      </div>
+    </>
   );
 }

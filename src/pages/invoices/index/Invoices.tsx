@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
+import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,7 @@ import {
   useEntityTagFilterColumns,
   useTagFilterCleanup,
 } from '$app/common/hooks/useEntityTagFilters';
+import { useEntityUserFilterColumns } from '$app/common/hooks/useEntityUserFilters';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
@@ -56,6 +58,7 @@ import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export default function Invoices() {
+  const invoicePaths = useInvoiceEditorPaths();
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();
@@ -90,11 +93,18 @@ export default function Invoices() {
   const selectedColumns =
     reactSettings?.react_table_columns?.invoice || defaultColumns;
   const shouldShowTagFilter = selectedColumns.includes('tags');
+  const shouldShowUserFilter = selectedColumns.includes('user');
+  const shouldShowAssignedUserFilter =
+    selectedColumns.includes('assigned_user');
   const filterColumns = useEntityTagFilterColumns(
     TAG_ENTITY_TYPES.invoice,
     'invoice_tag_ids',
     { enabled: shouldShowTagFilter }
   );
+  const userFilterColumns = useEntityUserFilterColumns({
+    user: shouldShowUserFilter,
+    assignedUser: shouldShowAssignedUserFilter,
+  });
 
   useTagFilterCleanup(shouldShowTagFilter, 'invoice_tag_ids');
 
@@ -122,12 +132,14 @@ export default function Invoices() {
           shouldShowTagFilter ? ',tags' : ''
         }&without_deleted_clients=true&sort=id|desc${
           shouldShowTagFilter ? '' : '&tag_ids='
+        }${shouldShowUserFilter ? '' : '&user_ids='}${
+          shouldShowAssignedUserFilter ? '' : '&assigned_user_ids='
         }`}
         columns={columns}
         footerColumns={footerColumns}
         bulkRoute="/api/v1/invoices/bulk"
-        linkToCreate="/invoices/create"
-        linkToEdit="/invoices/:id/edit"
+        linkToCreate={invoicePaths.create}
+        linkToEdit={invoicePaths.edit}
         withResourcefulActions
         withoutDefaultBulkActions
         customActions={actions}
@@ -135,7 +147,10 @@ export default function Invoices() {
         customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterPlaceholder="status"
-        filterColumns={shouldShowTagFilter ? filterColumns : undefined}
+        filterColumns={[
+          ...userFilterColumns,
+          ...(shouldShowTagFilter ? filterColumns : []),
+        ]}
         rightSide={
           <div className="flex items-center space-x-2">
             {Boolean(reactSettings.show_table_footer) && (

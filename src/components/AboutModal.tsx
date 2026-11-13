@@ -200,7 +200,7 @@ export function AboutModal(props: Props) {
       >
         <div className="flex flex-col text-center">
           <div className="flex flex-col">
-            <span className="text-gray-800">
+            <span style={{ color: colors.$3 }}>
               {user?.first_name} {user?.last_name}
             </span>
             <span>{user?.email}</span>
@@ -217,7 +217,7 @@ export function AboutModal(props: Props) {
             disableWithoutIcon
             disabled={isFormBusy}
           >
-            <Icon element={Activity} color="white" />
+            <Icon element={Activity} color={colors.$1} />
             <span>{t('health_check')}</span>
           </Button>
         )}
@@ -234,7 +234,7 @@ export function AboutModal(props: Props) {
               disableWithoutIcon
               disabled={isFormBusy}
             >
-              <Icon element={DownloadCloud} color="white" />
+              <Icon element={DownloadCloud} color={colors.$1} />
               <span>{t('force_update')}</span>
             </Button>
           )}
