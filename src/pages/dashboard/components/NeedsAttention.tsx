@@ -29,7 +29,6 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
