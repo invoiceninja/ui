@@ -10,7 +10,7 @@
 
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { numberBreadcrumb } from '$app/common/helpers/breadcrumbs';
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -25,6 +25,7 @@ export default function Email() {
 
   const { documentTitle } = useTitle('email_invoice');
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
 
   const { data: invoice } = useInvoiceQuery({ id });
 
@@ -62,7 +63,11 @@ export default function Email() {
           resource={invoice}
           resourceType="invoice"
           list={list}
-          defaultEmail="email_template_invoice"
+          defaultEmail={
+            Object.keys(list).includes(searchParams.get('template') ?? '')
+              ? (searchParams.get('template') as string)
+              : 'email_template_invoice'
+          }
           redirectUrl={route('/clients/:id', { id: invoice.client_id })}
         />
       )}

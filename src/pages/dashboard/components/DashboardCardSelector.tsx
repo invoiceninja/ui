@@ -23,6 +23,8 @@ import { CgOptions } from 'react-icons/cg';
 import { IoWarning } from 'react-icons/io5';
 import { MdClose, MdDragIndicator } from 'react-icons/md';
 import { useColorScheme } from '$app/common/colors';
+import { ModuleBitmask } from '$app/common/enums/module-bitmask';
+import { useEnabled } from '$app/common/guards/guards/enabled';
 import {
   decodeDashboardField,
   encodeDashboardField,
@@ -32,6 +34,7 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import {
   useReactSettings,
   useSaveReactSettings,
+  useUpdateReactSettings,
 } from '$app/common/hooks/useReactSettings';
 import {
   Calculate,
@@ -41,12 +44,14 @@ import {
   StoredFormat,
 } from '$app/common/interfaces/company-user';
 import { Button, InputField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
 import { Modal } from '$app/components/Modal';
 import {
   DASHBOARD_FIELD_RULES,
   TASK_METRIC_FIELDS,
 } from '../helpers/dashboard-card-fields';
+import { NEEDS_ATTENTION_CARD } from '../helpers/needs-attention';
 import { useTaskMetricFieldsSupport } from '../hooks/useTaskMetricFieldsSupport';
 
 export const FIELDS_LABELS: Record<string, string> = {
@@ -216,8 +221,10 @@ export function DashboardCardSelector() {
 
   const colors = useColorScheme();
   const currentUser = useCurrentUser();
+  const enabled = useEnabled();
   const reactSettings = useReactSettings();
   const saveSettings = useSaveReactSettings();
+  const updateSettings = useUpdateReactSettings();
   const supportsTaskMetrics = useTaskMetricFieldsSupport();
 
   const fieldsRef = useRef<string[]>([]);
@@ -226,6 +233,8 @@ export function DashboardCardSelector() {
   const [fields, setFields] = useState<string[]>([]);
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [manageOpen, setManageOpen] = useState<boolean>(false);
+  const [isNeedsAttentionVisible, setIsNeedsAttentionVisible] =
+    useState<boolean>(true);
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedField, setSelectedField] = useState<Field | ''>('');
@@ -259,6 +268,14 @@ export function DashboardCardSelector() {
     setCalculate('sum');
     setFormat('money');
   }, [manageOpen, currentUser, reactSettings.dashboard_fields]);
+
+  useEffect(() => {
+    if (manageOpen) {
+      setIsNeedsAttentionVisible(
+        !reactSettings.hidden_dashboard_cards?.includes(NEEDS_ATTENTION_CARD)
+      );
+    }
+  }, [manageOpen, reactSettings.hidden_dashboard_cards]);
 
   const availableFields = useMemo(
     () =>
@@ -328,6 +345,17 @@ export function DashboardCardSelector() {
     toast.processing();
     setIsFormBusy(true);
 
+    const otherHiddenCards = (
+      reactSettings.hidden_dashboard_cards ?? []
+    ).filter((card) => card !== NEEDS_ATTENTION_CARD);
+
+    updateSettings(
+      'hidden_dashboard_cards',
+      isNeedsAttentionVisible
+        ? otherHiddenCards
+        : [...otherHiddenCards, NEEDS_ATTENTION_CARD]
+    );
+
     saveSettings('dashboard_fields', fieldsRef.current)
       .then(() => {
         toast.success('updated_settings');
@@ -335,7 +363,14 @@ export function DashboardCardSelector() {
       })
       .catch(() => toast.dismiss())
       .finally(() => setIsFormBusy(false));
-  }, [currentUser, isFormBusy, saveSettings]);
+  }, [
+    currentUser,
+    isFormBusy,
+    saveSettings,
+    updateSettings,
+    isNeedsAttentionVisible,
+    reactSettings.hidden_dashboard_cards,
+  ]);
 
   const handleSelectField = useCallback((field: Field) => {
     const rules = DASHBOARD_FIELD_RULES[field];
@@ -432,6 +467,30 @@ export function DashboardCardSelector() {
             >
               {t('current')} {t('cards')}
             </span>
+
+            {enabled(ModuleBitmask.Invoices) && (
+              <div
+                className={classNames(
+                  'flex items-center justify-between rounded-md px-2 py-2 mx-2 mb-0.5',
+                  {
+                    'bg-gray-100': !reactSettings.dark_mode,
+                    'bg-[#1f2e41]': reactSettings.dark_mode,
+                  }
+                )}
+              >
+                <span
+                  className="text-sm font-medium truncate"
+                  style={{ color: colors.$3 }}
+                >
+                  {t('needs_your_attention')}
+                </span>
+
+                <Toggle
+                  checked={isNeedsAttentionVisible}
+                  onValueChange={(value) => setIsNeedsAttentionVisible(value)}
+                />
+              </div>
+            )}
 
             <div
               ref={scrollContainerRef}

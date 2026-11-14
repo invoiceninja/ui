@@ -110,6 +110,7 @@ export interface ReactSettings {
   color_theme?: ColorTheme;
   client_show_cards?: ClientShowCard[];
   dashboard_fields?: string[];
+  hidden_dashboard_cards?: string[];
   show_advanced_invoice_editor?: boolean;
 }
 
