@@ -1,0 +1,28 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
+import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+
+export const isDraft = (
+  recurringInvoice: RecurringInvoice | undefined
+): boolean => {
+  return (
+    !recurringInvoice?.id ||
+    recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT
+  );
+};
+
+export const isRunning = (recurringInvoice: RecurringInvoice): boolean => {
+  return (
+    recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE ||
+    recurringInvoice.status_id === RecurringInvoiceStatus.PENDING
+  );
+};

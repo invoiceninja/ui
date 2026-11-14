@@ -9,6 +9,7 @@
  */
 
 import { useParams } from 'react-router-dom';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { permission } from '$app/common/guards/guards/permission';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
@@ -21,6 +22,7 @@ import {
 import { useFooterColumns } from '$app/pages/recurring-invoices/common/hooks/useFooterColumns';
 
 export default function RecurringInvoices() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const { id } = useParams();
 
   const hasPermission = useHasPermission();
@@ -46,10 +48,10 @@ export default function RecurringInvoices() {
       customFilterPlaceholder="status"
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
-      linkToCreate={route('/recurring_invoices/create?client=:id', {
+      linkToCreate={route(`${recurringInvoicePaths.create}?client=:id`, {
         id,
       })}
-      linkToEdit="/recurring_invoices/:id/edit"
+      linkToEdit={recurringInvoicePaths.edit}
       excludeColumns={['client_id']}
       linkToCreateGuards={[permission('create_recurring_invoice')]}
       hideEditableOptions={!hasPermission('edit_recurring_invoice')}

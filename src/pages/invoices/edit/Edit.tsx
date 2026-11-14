@@ -19,6 +19,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
+import { useRecurringInvoiceEditorPaths } from '$app/common/hooks/useRecurringInvoiceEditor';
 import { route } from '$app/common/helpers/route';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useScrollToLineItem } from '$app/common/hooks/useScrollToLineItem';
@@ -74,6 +75,7 @@ export interface Context {
 }
 
 export default function Edit() {
+  const recurringInvoicePaths = useRecurringInvoiceEditorPaths();
   const [t] = useTranslation();
 
   const colors = useColorScheme();
@@ -179,7 +181,7 @@ export default function Edit() {
                 </span>
 
                 <Link
-                  to={route('/recurring_invoices/:id/edit', {
+                  to={route(recurringInvoicePaths.edit, {
                     id: invoice.recurring_id,
                   })}
                 >
