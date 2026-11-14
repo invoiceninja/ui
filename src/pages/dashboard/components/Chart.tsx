@@ -9,7 +9,7 @@
  */
 
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CartesianGrid,
@@ -24,9 +24,15 @@ import {
 import { useColorScheme } from '$app/common/colors';
 import { date as formatDate, useParseDayjs } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCountries } from '$app/common/hooks/useCountries';
+import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { ensureUniqueDates, generateMonthDateRange } from '../helpers/helpers';
+import {
+  createChartBucketResolver,
+  ensureUniqueDates,
+  generateMonthDateRange,
+} from '../helpers/helpers';
 import { useGenerateWeekDateRange } from '../hooks/useGenerateWeekDateRange';
 import { ChartData } from './Totals';
 
@@ -76,8 +82,8 @@ export function Chart(props: Props) {
   const generateWeekDateRange = useGenerateWeekDateRange();
 
   const formatMoney = useFormatMoney();
-
-  const [chartData, setChartData] = useState<LineChartData>([]);
+  const currencies = useCurrencies();
+  const countries = useCountries();
 
   const generateDateRange = (
     startDate: Date,
@@ -114,41 +120,71 @@ export function Chart(props: Props) {
     return ensureUniqueDates(dates, end);
   };
 
-  const getRecordIndex = (data: LineChartData | undefined, date: string) => {
-    if (!data || !date) return -1;
+  const chartData = useMemo(() => {
+    const dates = generateDateRange(
+      new Date(props.dates.start_date),
+      new Date(props.dates.end_date),
+      props.chartSensitivity
+    );
 
-    let isEntryDateMatch = false;
+    const data: LineChartData = dates.map((date) => ({
+      date: formatDate(date.toString(), dateFormat),
+      invoices: 0,
+      outstanding: 0,
+      payments: 0,
+      expenses: 0,
+    }));
 
-    const recordIndex = data.findIndex((entry, index) => {
-      const nextEntry = data[index + 1];
+    const resolveRecordIndex = createChartBucketResolver(
+      data.map((entry) => entry.date),
+      parseDayjs,
+      chartSensitivity
+    );
 
-      if (nextEntry) {
-        const dateToCheck = parseDayjs(date);
+    props.data?.invoices.forEach((invoice) => {
+      const date = formatDate(invoice.date, dateFormat);
+      const recordIndex = resolveRecordIndex(date);
 
-        const startDate = parseDayjs(entry.date);
-        const endDate = parseDayjs(nextEntry.date);
-
-        const isDateInRange =
-          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
-
-        isEntryDateMatch = entry.date === date;
-
-        return isDateInRange || isEntryDateMatch;
+      if (recordIndex >= 0) {
+        data[recordIndex].invoices += parseFloat(invoice.total);
       }
-
-      if (!nextEntry && entry) {
-        isEntryDateMatch = entry.date === date;
-
-        return isEntryDateMatch;
-      }
-
-      return false;
     });
 
-    return chartSensitivity !== 'day' && recordIndex > -1 && !isEntryDateMatch
-      ? recordIndex + 1
-      : recordIndex;
-  };
+    props.data?.outstanding.forEach((outstanding) => {
+      const date = formatDate(outstanding.date, dateFormat);
+      const recordIndex = resolveRecordIndex(date);
+
+      if (recordIndex >= 0) {
+        data[recordIndex].outstanding += parseFloat(outstanding.total);
+      }
+    });
+
+    props.data?.payments.forEach((payment) => {
+      const date = formatDate(payment.date, dateFormat);
+      const recordIndex = resolveRecordIndex(date);
+
+      if (recordIndex >= 0) {
+        data[recordIndex].payments += parseFloat(payment.total);
+      }
+    });
+
+    props.data?.expenses.forEach((expense) => {
+      const date = formatDate(expense.date, dateFormat);
+      const recordIndex = resolveRecordIndex(date);
+
+      if (recordIndex >= 0) {
+        data[recordIndex].expenses += parseFloat(expense.total);
+      }
+    });
+
+    return data;
+  }, [
+    props.data,
+    props.dates.start_date,
+    props.dates.end_date,
+    props.chartSensitivity,
+    dateFormat,
+  ]);
 
   const yAxisWidth = useMemo(() => {
     const properties = ['invoices', 'outstanding', 'payments', 'expenses'];
@@ -168,61 +204,14 @@ export function Chart(props: Props) {
     }, 0);
 
     return largestTick ? largestTick * 8.5 : undefined;
-  }, [chartData]);
-
-  useEffect(() => {
-    const dates = generateDateRange(
-      new Date(props.dates.start_date),
-      new Date(props.dates.end_date),
-      props.chartSensitivity
-    );
-
-    const data: LineChartData = dates.map((date) => ({
-      date: formatDate(date.toString(), dateFormat),
-      invoices: 0,
-      outstanding: 0,
-      payments: 0,
-      expenses: 0,
-    }));
-
-    props.data?.invoices.forEach((invoice) => {
-      const date = formatDate(invoice.date, dateFormat);
-      const recordIndex = getRecordIndex(data, date);
-
-      if (recordIndex >= 0) {
-        data[recordIndex].invoices += parseFloat(invoice.total);
-      }
-    });
-
-    props.data?.outstanding.forEach((outstanding) => {
-      const date = formatDate(outstanding.date, dateFormat);
-      const recordIndex = getRecordIndex(data, date);
-
-      if (recordIndex >= 0) {
-        data[recordIndex].outstanding += parseFloat(outstanding.total);
-      }
-    });
-
-    props.data?.payments.forEach((payment) => {
-      const date = formatDate(payment.date, dateFormat);
-      const recordIndex = getRecordIndex(data, date);
-
-      if (recordIndex >= 0) {
-        data[recordIndex].payments += parseFloat(payment.total);
-      }
-    });
-
-    props.data?.expenses.forEach((expense) => {
-      const date = formatDate(expense.date, dateFormat);
-      const recordIndex = getRecordIndex(data, date);
-
-      if (recordIndex >= 0) {
-        data[recordIndex].expenses += parseFloat(expense.total);
-      }
-    });
-
-    setChartData(data);
-  }, [props.data, props.dates, props.chartSensitivity]);
+  }, [
+    chartData,
+    currency,
+    company?.settings.country_id,
+    company?.settings.currency_id,
+    currencies,
+    countries,
+  ]);
 
   const colors = useColorScheme();
 
