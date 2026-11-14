@@ -12,6 +12,7 @@ import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
@@ -104,6 +105,8 @@ export function useClientColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const disableNavigation = useDisableNavigation();
+
+  const { isAdmin, isOwner } = useAdmin();
 
   const company = useCurrentCompany();
   const reactSettings = useReactSettings();
@@ -427,13 +430,14 @@ export function useClientColumns() {
       label: t('group'),
       format: (value, client) =>
         Boolean(value) && (
-          <Link
+          <DynamicLink
             to={route('/settings/group_settings/:id/edit', {
               id: value,
             })}
+            renderSpan={!isAdmin && !isOwner}
           >
             {client.group_settings?.name}
-          </Link>
+          </DynamicLink>
         ),
     },
     {

@@ -24,6 +24,7 @@ import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { EntityState } from '$app/common/enums/entity-state';
 import { ApiTransactionType } from '$app/common/enums/transactions';
 import { getEntityState } from '$app/common/helpers';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityPageIdentifier } from '$app/common/hooks/useEntityPageIdentifier';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
@@ -40,6 +41,7 @@ export function useActions() {
 
   const bulk = useBulk();
   const navigate = useNavigate();
+  const hasPermission = useHasPermission();
 
   const { isEditPage } = useEntityPageIdentifier({ entity: 'transaction' });
 
@@ -70,7 +72,8 @@ export function useActions() {
 
   const actions: Action<Transaction>[] = [
     (transaction) =>
-      transaction.base_type === ApiTransactionType.Credit && (
+      transaction.base_type === ApiTransactionType.Credit &&
+      hasPermission('create_invoice') && (
         <DropdownElement
           onClick={() => handleCreateInvoice(transaction)}
           icon={<Icon element={MdControlPointDuplicate} />}
@@ -91,7 +94,8 @@ export function useActions() {
       Boolean(
         (transaction.payment_id ||
           transaction.expense_id ||
-          transaction.base_type === ApiTransactionType.Credit) &&
+          (transaction.base_type === ApiTransactionType.Credit &&
+            hasPermission('create_invoice'))) &&
           isEditPage
       ) && <Divider withoutPadding />,
     (transaction) =>

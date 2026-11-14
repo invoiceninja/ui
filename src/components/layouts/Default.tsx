@@ -20,6 +20,7 @@ import { isDemo, isHosted, isSelfHosted, trans } from '$app/common/helpers';
 import { isEmbedded } from '$app/common/helpers/embed';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { usePreventNavigation } from '$app/common/hooks/usePreventNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
@@ -80,6 +81,7 @@ export function Default(props: Props) {
   const user = useCurrentUser();
   const companyUser = useCurrentCompanyUser();
   const reactSettings = useReactSettings();
+  const disableNavigation = useDisableNavigation();
 
   const isMiniSidebar = Boolean(reactSettings.show_mini_sidebar);
 
@@ -119,9 +121,11 @@ export function Default(props: Props) {
             </span>
           </span>
 
-          <div className="flex justify-center">
-            <Link to={`/invoices/${data.id}/edit`}>{t('view_invoice')}</Link>
-          </div>
+          {!disableNavigation('invoice', data) && (
+            <div className="flex justify-center">
+              <Link to={`/invoices/${data.id}/edit`}>{t('view_invoice')}</Link>
+            </div>
+          )}
         </div>,
         {
           duration: 8000,

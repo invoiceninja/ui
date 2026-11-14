@@ -20,8 +20,10 @@ import { useInvoiceEditorPaths } from '$app/common/hooks/useInvoiceEditor';
 import { date, endpoint, trans } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { Card } from '$app/components/cards';
@@ -41,18 +43,25 @@ export function useGenerateActivityElement() {
   const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
-      client: (
+      client: disableNavigation('client', null) ? (
+        activity.client?.label
+      ) : (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
           {activity.client?.label}
         </Link>
       ),
 
       user: activity.user?.label ?? t('system'),
-      invoice: (
+      invoice: disableNavigation('invoice', null) ? (
+        activity?.invoice?.label
+      ) : (
         <Link
           to={route(invoicePaths.edit, {
             id: activity.invoice?.hashed_id,
@@ -62,7 +71,9 @@ export function useGenerateActivityElement() {
         </Link>
       ),
 
-      recurring_invoice: (
+      recurring_invoice: disableNavigation('recurring_invoice', null) ? (
+        activity?.recurring_invoice?.label
+      ) : (
         <Link
           to={route('/recurring_invoices/:id/edit', {
             id: activity?.recurring_invoice?.hashed_id,
@@ -72,7 +83,9 @@ export function useGenerateActivityElement() {
         </Link>
       ),
 
-      contact: (
+      contact: !hasPermission('edit_client') ? (
+        activity?.contact?.label
+      ) : (
         <Link
           to={route('/clients/:id/edit', {
             id: activity?.contact?.hashed_id,
@@ -92,7 +105,9 @@ export function useGenerateActivityElement() {
 
       payment_amount: activity?.payment_amount?.label,
 
-      payment: (
+      payment: disableNavigation('payment', null) ? (
+        activity?.payment?.label
+      ) : (
         <Link
           to={route('/payments/:id/edit', { id: activity?.payment?.hashed_id })}
         >

@@ -23,6 +23,7 @@ import { route } from '$app/common/helpers/route';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { useReplaceVariables } from '$app/common/hooks/useReplaceTranslationVariables';
@@ -137,6 +138,7 @@ export function Notifications() {
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
   const companyUser = useCurrentCompanyUser();
+  const disableNavigation = useDisableNavigation();
   const { timeFormat } = useCompanyTimeFormat();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -153,7 +155,9 @@ export function Notifications() {
       return replaceVariables(
         t('notification_invoice_paid_subject') as string,
         {
-          invoice: (
+          invoice: disableNavigation('invoice', null) ? (
+            `#${currentDisplayLabel.invoiceNumber}`
+          ) : (
             <Link
               to={route(invoicePaths.edit, {
                 id: currentDisplayLabel.invoiceId,
@@ -163,7 +167,9 @@ export function Notifications() {
             </Link>
           ),
 
-          client: (
+          client: disableNavigation('client', null) ? (
+            currentDisplayLabel.clientName
+          ) : (
             <Link
               to={route('/clients/:id', { id: currentDisplayLabel.clientId })}
             >
@@ -178,7 +184,9 @@ export function Notifications() {
       return replaceVariables(
         t('notification_invoice_viewed_subject') as string,
         {
-          invoice: (
+          invoice: disableNavigation('invoice', null) ? (
+            `#${currentDisplayLabel.invoiceNumber}`
+          ) : (
             <Link
               to={route(invoicePaths.edit, {
                 id: currentDisplayLabel.invoiceId,
@@ -188,7 +196,9 @@ export function Notifications() {
             </Link>
           ),
 
-          client: (
+          client: disableNavigation('client', null) ? (
+            currentDisplayLabel.clientName
+          ) : (
             <Link
               to={route('/clients/:id', { id: currentDisplayLabel.clientId })}
             >
@@ -203,7 +213,9 @@ export function Notifications() {
       return replaceVariables(
         t('notification_credit_created_subject') as string,
         {
-          invoice: (
+          invoice: disableNavigation('credit', null) ? (
+            `#${currentDisplayLabel.creditNumber}`
+          ) : (
             <Link
               to={route('/credits/:id/edit', {
                 id: currentDisplayLabel.creditId,
@@ -213,7 +225,9 @@ export function Notifications() {
             </Link>
           ),
 
-          client: (
+          client: disableNavigation('client', null) ? (
+            currentDisplayLabel.clientName
+          ) : (
             <Link
               to={route('/clients/:id', { id: currentDisplayLabel.clientId })}
             >
@@ -229,13 +243,17 @@ export function Notifications() {
         <div className="flex items-center space-x-1">
           <span>{t('credit_updated')}:</span>
 
-          <Link
-            to={route('/credits/:id/edit', {
-              id: currentDisplayLabel.creditId,
-            })}
-          >
-            {`#${currentDisplayLabel.creditNumber}`}
-          </Link>
+          {disableNavigation('credit', null) ? (
+            <span>{`#${currentDisplayLabel.creditNumber}`}</span>
+          ) : (
+            <Link
+              to={route('/credits/:id/edit', {
+                id: currentDisplayLabel.creditId,
+              })}
+            >
+              {`#${currentDisplayLabel.creditNumber}`}
+            </Link>
+          )}
         </div>
       );
     }
@@ -245,13 +263,17 @@ export function Notifications() {
         <div className="flex items-center space-x-1">
           <span>{t('payment_updated')}:</span>
 
-          <Link
-            to={route('/payments/:id/edit', {
-              id: currentDisplayLabel.paymentId,
-            })}
-          >
-            {`#${currentDisplayLabel.paymentNumber}`}
-          </Link>
+          {disableNavigation('payment', null) ? (
+            <span>{`#${currentDisplayLabel.paymentNumber}`}</span>
+          ) : (
+            <Link
+              to={route('/payments/:id/edit', {
+                id: currentDisplayLabel.paymentId,
+              })}
+            >
+              {`#${currentDisplayLabel.paymentNumber}`}
+            </Link>
+          )}
         </div>
       );
     }

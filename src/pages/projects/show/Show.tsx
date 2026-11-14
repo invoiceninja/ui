@@ -20,6 +20,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Expense } from '$app/common/interfaces/expense';
@@ -28,8 +29,9 @@ import { Invoice } from '$app/common/interfaces/invoice';
 import { Project } from '$app/common/interfaces/project';
 import { Quote } from '$app/common/interfaces/quote';
 import { Page } from '$app/components/Breadcrumbs';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { EntityStatus } from '$app/components/EntityStatus';
-import { InputLabel, Link } from '$app/components/forms';
+import { InputLabel } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { InfoCard } from '$app/components/InfoCard';
 import { Default } from '$app/components/layouts/Default';
@@ -71,6 +73,7 @@ export default function Show() {
   const navigate = useNavigate();
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const { data: project } = useQuery({
     queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
@@ -175,34 +178,37 @@ export default function Show() {
             <div className="flex flex-col items-start gap-1">
               {projectWithRelations.invoices?.map(
                 (invoice: Invoice, index: number) => (
-                  <Link
+                  <DynamicLink
                     key={index}
                     to={route('/invoices/:id/edit', { id: invoice.id })}
+                    renderSpan={disableNavigation('invoice', invoice)}
                   >
                     {t('invoice')} #{invoice.number}
-                  </Link>
+                  </DynamicLink>
                 )
               )}
 
               {projectWithRelations.quotes?.map(
                 (quote: Quote, index: number) => (
-                  <Link
+                  <DynamicLink
                     key={index}
                     to={route('/quotes/:id/edit', { id: quote.id })}
+                    renderSpan={disableNavigation('quote', quote)}
                   >
                     {t('quote')} #{quote.number}
-                  </Link>
+                  </DynamicLink>
                 )
               )}
 
               {projectWithRelations.expenses?.map(
                 (expense: Expense, index: number) => (
-                  <Link
+                  <DynamicLink
                     key={index}
                     to={route('/expenses/:id/edit', { id: expense.id })}
+                    renderSpan={disableNavigation('expense', expense)}
                   >
                     {t('expense')} #{expense.number}
-                  </Link>
+                  </DynamicLink>
                 )
               )}
             </div>

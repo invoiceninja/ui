@@ -14,7 +14,12 @@ import { MdCheckCircle } from 'react-icons/md';
 import { Link, useOutletContext } from 'react-router-dom';
 import { useColorScheme } from '$app/common/colors';
 import { route } from '$app/common/helpers/route';
+import {
+  useAdmin,
+  useHasPermission,
+} from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Card, Element } from '$app/components/cards';
@@ -33,6 +38,11 @@ export default function EInvoice() {
   const colors = useColorScheme();
 
   const company = useCurrentCompany();
+
+  const { isAdmin, isOwner } = useAdmin();
+
+  const hasPermission = useHasPermission();
+  const entityAssigned = useEntityAssigned();
 
   const displayEInvoiceAndStatusCard =
     company?.settings.e_invoice_type === 'PEPPOL' &&
@@ -132,17 +142,19 @@ export default function EInvoice() {
                           </Link>
                         )}
 
-                        {entity === 'client' && (
-                          <Link
-                            to={route('/clients/:id/edit', {
-                              id: recurringInvoice?.client_id,
-                            })}
-                          >
-                            {t('edit_client')}
-                          </Link>
-                        )}
+                        {entity === 'client' &&
+                          (hasPermission('edit_client') ||
+                            entityAssigned(recurringInvoice?.client)) && (
+                            <Link
+                              to={route('/clients/:id/edit', {
+                                id: recurringInvoice?.client_id,
+                              })}
+                            >
+                              {t('edit_client')}
+                            </Link>
+                          )}
 
-                        {entity === 'company' && (
+                        {entity === 'company' && (isAdmin || isOwner) && (
                           <Link to="/settings/company_details">
                             {t('settings')}
                           </Link>

@@ -19,6 +19,7 @@ import { sanitizeHTML } from '$app/common/helpers/html-string';
 import { route } from '$app/common/helpers/route';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { TAG_ENTITY_TYPES } from '$app/common/interfaces/tag';
 import { Task } from '$app/common/interfaces/task';
@@ -63,6 +64,7 @@ export function TaskDetails(props: Props) {
 
   const hasPermission = useHasPermission();
   const entityAssigned = useEntityAssigned();
+  const disableNavigation = useDisableNavigation();
 
   const { task, handleChange, errors, page } = props;
 
@@ -259,20 +261,21 @@ export function TaskDetails(props: Props) {
               />
             </div>
 
-            {task?.project_id && (
-              <div
-                className="flex item-center gap-2 pl-2 mt-6"
-                style={{ color: colors.$3, colorScheme: colors.$0 }}
-              >
-                <Link
-                  to={route('/projects/:id', {
-                    id: task.project_id,
-                  })}
+            {task?.project_id &&
+              !disableNavigation('project', task.project) && (
+                <div
+                  className="flex item-center gap-2 pl-2 mt-6"
+                  style={{ color: colors.$3, colorScheme: colors.$0 }}
                 >
-                  <Icon element={MdLaunch} size={18} />
-                </Link>
-              </div>
-            )}
+                  <Link
+                    to={route('/projects/:id', {
+                      id: task.project_id,
+                    })}
+                  >
+                    <Icon element={MdLaunch} size={18} />
+                  </Link>
+                </div>
+              )}
           </div>
 
           <UserSelector

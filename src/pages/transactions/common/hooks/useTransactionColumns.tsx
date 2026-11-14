@@ -18,7 +18,6 @@ import { useResolveUserName } from '$app/common/hooks/useEntityUserFilters';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { DynamicLink } from '$app/components/DynamicLink';
 import { Tooltip } from '$app/components/Tooltip';
-import { Link } from '$app/components/forms';
 import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useCleanDescriptionText } from './useCleanDescription';
@@ -170,9 +169,13 @@ export function useTransactionColumns() {
         return (
           <div className="flex space-x-2">
             {ids.map((id, index) => (
-              <Link key={id} to={route(invoicePaths.edit, { id })}>
+              <DynamicLink
+                key={id}
+                to={route(invoicePaths.edit, { id })}
+                renderSpan={disableNavigation('invoice', null)}
+              >
                 {t('invoice')} #{index + 1}
-              </Link>
+              </DynamicLink>
             ))}
           </div>
         );
@@ -191,9 +194,12 @@ export function useTransactionColumns() {
           <div className="flex space-x-1">
             {expenseIds.map((id, index) => (
               <div key={id} className="flex">
-                <Link to={route('/expenses/:id/edit', { id })}>
+                <DynamicLink
+                  to={route('/expenses/:id/edit', { id })}
+                  renderSpan={disableNavigation('expense', null)}
+                >
                   {t('expense')} #{index + 1}
-                </Link>
+                </DynamicLink>
 
                 <span>{expenseIds.length - 1 !== index && ','}</span>
               </div>

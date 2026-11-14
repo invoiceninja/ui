@@ -30,6 +30,8 @@ import { route } from '$app/common/helpers/route';
 import reactStringReplace from 'react-string-replace';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
+import { useDisableNavigation } from '$app/common/hooks/useDisableNavigation';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { useActions } from '../hooks';
 import { TaskStatus } from './TaskStatus';
 import { Task } from '$app/common/interfaces/task';
@@ -73,14 +75,20 @@ const Box = styled.div`
 function useGenerateActivityElement() {
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   return (activity: TaskActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
       client: (
-        <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
+        <DynamicLink
+          to={route('/clients/:id', { id: activity.client?.hashed_id })}
+          renderSpan={disableNavigation('client', null)}
+        >
           {activity.client?.label}
-        </Link>
+        </DynamicLink>
       ),
       user: activity.user?.label ?? t('system'),
       task: (
@@ -93,13 +101,14 @@ function useGenerateActivityElement() {
         </Link>
       ),
       contact: (
-        <Link
+        <DynamicLink
           to={route('/clients/:id/edit', {
             id: activity?.contact?.hashed_id,
           })}
+          renderSpan={!hasPermission('edit_client')}
         >
           {activity?.contact?.label}
-        </Link>
+        </DynamicLink>
       ),
     };
     for (const [variable, value] of Object.entries(replacements)) {

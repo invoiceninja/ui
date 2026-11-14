@@ -11,8 +11,12 @@
 import { useTranslation } from 'react-i18next';
 import { date } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import {
+  Entity,
+  useDisableNavigation,
+} from '$app/common/hooks/useDisableNavigation';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
-import { Link } from '$app/components/forms';
+import { DynamicLink } from '$app/components/DynamicLink';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Document } from '../pages/Documents';
 
@@ -47,6 +51,7 @@ export function useDocumentColumns() {
 
   const reactSettings = useReactSettings();
   const documentColumns = useAllDocumentColumns();
+  const disableNavigation = useDisableNavigation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   type DocumentColumns = (typeof documentColumns)[number];
@@ -65,7 +70,17 @@ export function useDocumentColumns() {
         if (value) {
           const entity = (value as string).split('/')[1];
 
-          return <Link to={value as string}>{t(entity.slice(0, -1))}</Link>;
+          return (
+            <DynamicLink
+              to={value as string}
+              renderSpan={disableNavigation(
+                entity.slice(0, -1) as Entity,
+                null
+              )}
+            >
+              {t(entity.slice(0, -1))}
+            </DynamicLink>
+          );
         }
       },
     },

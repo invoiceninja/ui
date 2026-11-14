@@ -111,6 +111,9 @@ export function useGenerateActivityElement() {
   const invoicePaths = useInvoiceEditorPaths();
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
+  const disableNavigation = useDisableNavigation();
+
   return (activity: InvoiceActivity) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
@@ -123,7 +126,9 @@ export function useGenerateActivityElement() {
     }
 
     const replacements = {
-      client: (
+      client: disableNavigation('client', null) ? (
+        activity.client?.label
+      ) : (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
           {activity.client?.label}
         </Link>
@@ -140,7 +145,9 @@ export function useGenerateActivityElement() {
         </Link>
       ),
 
-      recurring_invoice: (
+      recurring_invoice: disableNavigation('recurring_invoice', null) ? (
+        activity?.recurring_invoice?.label
+      ) : (
         <Link
           to={route('/recurring_invoices/:id/edit', {
             id: activity?.recurring_invoice?.hashed_id,
@@ -150,7 +157,9 @@ export function useGenerateActivityElement() {
         </Link>
       ),
 
-      contact: (
+      contact: !hasPermission('edit_client') ? (
+        activity?.contact?.label
+      ) : (
         <Link
           to={route('/clients/:id/edit', {
             id: activity?.contact?.hashed_id,
@@ -168,7 +177,9 @@ export function useGenerateActivityElement() {
 
       payment_amount: activity?.payment_amount?.label,
 
-      payment: (
+      payment: disableNavigation('payment', null) ? (
+        activity?.payment?.label
+      ) : (
         <Link
           to={route('/payments/:id/edit', { id: activity?.payment?.hashed_id })}
         >
@@ -176,7 +187,9 @@ export function useGenerateActivityElement() {
         </Link>
       ),
 
-      credit: (
+      credit: disableNavigation('credit', null) ? (
+        activity?.credit?.label
+      ) : (
         <Link
           to={route('/credits/:id/edit', { id: activity?.credit?.hashed_id })}
         >
@@ -381,7 +394,9 @@ export function InvoiceSlider() {
               {invoice ? date(invoice.due_date, dateFormat) : null}
             </Element>
 
-            {invoice && invoice.recurring_id ? (
+            {invoice &&
+            invoice.recurring_id &&
+            !disableNavigation('recurring_invoice', null) ? (
               <Element
                 className="border-b border-dashed"
                 leftSide={t('recurring_invoice')}
@@ -605,11 +620,14 @@ export function InvoiceSlider() {
                 (lineItem, index) =>
                   (lineItem.expense_id || lineItem.task_id) && (
                     <React.Fragment key={index}>
-                      {lineItem.expense_id && (
-                        <ViewLineItemExpense expenseId={lineItem.expense_id} />
-                      )}
+                      {lineItem.expense_id &&
+                        !disableNavigation('expense', null) && (
+                          <ViewLineItemExpense
+                            expenseId={lineItem.expense_id}
+                          />
+                        )}
 
-                      {lineItem.task_id && (
+                      {lineItem.task_id && !disableNavigation('task', null) && (
                         <ViewLineItemTask taskId={lineItem.task_id} />
                       )}
                     </React.Fragment>
