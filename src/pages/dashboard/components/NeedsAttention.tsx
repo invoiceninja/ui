@@ -128,10 +128,7 @@ function NeedsAttentionRow(props: RowProps) {
         <div className="text-xs truncate">
           <span className="font-semibold text-red-500">
             {days > 0
-              ? trans(
-                  days === 1
-                    ? 'days_late_count_singular'
-                    : 'days_late_count_plural',
+              ? trans('days_late',
                   { count: days }
                 )
               : t('past_due')}
