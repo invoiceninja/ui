@@ -25,6 +25,11 @@ import { Credit } from '$app/common/interfaces/credit';
 import { Invitation } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
+import {
+  normalizeLineEntries,
+  withLineIds,
+} from '$app/components/e-invoice/line-fields/fields';
+import { useEInvoiceLinesAlignment } from '$app/components/e-invoice/line-fields/useEInvoiceLinesAlignment';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { Tab, Tabs } from '$app/components/Tabs';
@@ -50,6 +55,8 @@ export default function Create() {
 
   const company = useCurrentCompany();
 
+  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
+
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
@@ -64,6 +71,14 @@ export default function Create() {
       href: '/credits/create',
     },
     {
+      name: t('e_invoice'),
+      href: '/credits/create/e_invoice',
+      enabled:
+        Boolean(credit?.client_id) &&
+        (company?.settings.enable_e_invoice === true ||
+          company?.settings.e_invoice_type === 'PEPPOL'),
+    },
+    {
       name: t('documents'),
       href: '/credits/create/documents',
     },
@@ -75,7 +90,12 @@ export default function Create() {
 
   const [searchParams] = useSearchParams();
 
-  const [credit, setCredit] = useAtomWithPrevent(creditAtom);
+  useEInvoiceLinesAlignment({
+    resource: credit,
+    setResource: setCredit,
+    root: 'CreditNote',
+  });
+
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -156,6 +176,17 @@ export default function Create() {
           company?.settings?.inclusive_taxes ?? false;
 
         value = _credit;
+      }
+
+      if (value && Array.isArray(value.line_items)) {
+        value = {
+          ...value,
+          line_items: withLineIds(value.line_items),
+          e_invoice: normalizeLineEntries(
+            value.e_invoice,
+            'CreditNote'
+          ) as Credit['e_invoice'],
+        };
       }
 
       return value;

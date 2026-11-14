@@ -28,7 +28,6 @@ import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { $refetch } from '$app/common/hooks/useRefetch';
-import { useRefreshCompanyUsers } from '$app/common/hooks/useRefreshCompanyUsers';
 import { Client } from '$app/common/interfaces/client';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Invoice } from '$app/common/interfaces/invoice';
@@ -49,8 +48,8 @@ interface Props {
   setInvoice?: Dispatch<SetStateAction<Invoice | undefined>>;
 }
 
-interface PaymentMeansFormComponent {
-  saveEInvoice: () => void;
+export interface PaymentMeansFormComponent {
+  saveEInvoice: () => Promise<boolean | undefined>;
 }
 
 interface PaymentMeans {
@@ -329,7 +328,6 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     const [t] = useTranslation();
 
     const dispatch = useDispatch();
-    const refreshCompanyUsers = useRefreshCompanyUsers();
 
     const isClientLevel = props.entity === 'client';
     const eInvoice = isClientLevel ? props.currentEInvoice : company.e_invoice;
@@ -375,7 +373,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
         toast.processing();
         setErrors(null);
 
-        request(
+        return request(
           'POST',
           endpoint('/api/v1/einvoice/configurations'),
           isClientLevel && !values.payment_means[0].code
@@ -387,11 +385,9 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
 
             if (isClientLevel) {
               refreshClient();
-
-              return;
             }
 
-            refreshCompanyUsers();
+            return true;
           })
           .catch((error: AxiosError<ValidationBag>) => {
             if (error.response?.status === 422) {
@@ -399,10 +395,12 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
 
               setErrors(error.response.data);
 
-              return;
+              return false;
             }
 
             toast.error();
+
+            return false;
           })
           .finally(() => setSubmitting(false));
       },
@@ -411,7 +409,7 @@ export const PaymentMeans = forwardRef<PaymentMeansFormComponent, Props>(
     useImperativeHandle(ref, () => {
       return {
         saveEInvoice() {
-          form.submitForm();
+          return form.submitForm();
         },
       };
     }, [form.values]);

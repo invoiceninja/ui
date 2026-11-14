@@ -15,6 +15,9 @@ import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { Card } from '$app/components/cards';
+import { EInvoiceLines } from '$app/components/e-invoice/line-fields/EInvoiceLines';
+import { EInvoiceLinesTabLabel } from '$app/components/e-invoice/line-fields/EInvoiceLinesTabLabel';
+import { useEInvoiceLineFields } from '$app/components/e-invoice/line-fields/useEInvoiceLineFields';
 import { Spinner } from '$app/components/Spinner';
 import { TabGroup } from '$app/components/TabGroup';
 import { ClientSelector } from '../../common/components/ClientSelector';
@@ -61,6 +64,7 @@ export default function CreatePage() {
   const reactSettings = useReactSettings();
   const productColumns = useProductColumns();
   const { defaultTabIndex, handleTabChange } = useDefaultTabIndex(invoice);
+  const eInvoiceLineFields = useEInvoiceLineFields(invoice, 'Invoice');
 
   const {
     handleChange,
@@ -114,12 +118,28 @@ export default function CreatePage() {
 
         <div className="col-span-12">
           <TabGroup
-            tabs={[t('products'), t('tasks')]}
+            tabs={[
+              t('products'),
+              t('tasks'),
+              ...(eInvoiceLineFields.length
+                ? [t('e_invoice_line_fields')]
+                : []),
+            ]}
             defaultTabIndex={defaultTabIndex}
             onTabChange={handleTabChange}
             formatTabLabel={(index) => {
               if (index === 1) {
                 return <TasksTabLabel lineItems={invoice?.line_items || []} />;
+              }
+
+              if (index === 2) {
+                return (
+                  <EInvoiceLinesTabLabel
+                    eInvoice={invoice?.e_invoice}
+                    root="Invoice"
+                    errors={errors}
+                  />
+                );
               }
             }}
           >
@@ -179,6 +199,18 @@ export default function CreatePage() {
                 <Spinner />
               )}
             </div>
+
+            {invoice && eInvoiceLineFields.length ? (
+              <EInvoiceLines
+                resource={invoice}
+                root="Invoice"
+                fields={eInvoiceLineFields}
+                client={client}
+                onChange={(eInvoice) => handleChange('e_invoice', eInvoice)}
+              />
+            ) : (
+              <div />
+            )}
           </TabGroup>
         </div>
 

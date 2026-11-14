@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
@@ -17,6 +18,7 @@ import { useCompanyVerifactu } from '$app/common/hooks/useCompanyVerifactu';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEntityAssigned } from '$app/common/hooks/useEntityAssigned';
 import { Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { DocumentsTabLabel } from '$app/components/DocumentsTabLabel';
 import { Tab } from '$app/components/Tabs';
 import { ValidationEntityResponse } from '$app/pages/settings/e-invoice/common/hooks/useCheckEInvoiceValidation';
@@ -26,6 +28,7 @@ import { hasQuickbooksConnection } from '../helpers/quickbooks';
 interface Params {
   invoice: Invoice | undefined;
   eInvoiceValidationResponse?: ValidationEntityResponse | undefined;
+  errors?: ValidationBag;
 }
 export function useTabs(params: Params) {
   const [t] = useTranslation();
@@ -37,7 +40,7 @@ export function useTabs(params: Params) {
   const verifactuEnabled = useCompanyVerifactu();
 
   const { id } = useParams();
-  const { invoice, eInvoiceValidationResponse } = params;
+  const { invoice, eInvoiceValidationResponse, errors } = params;
 
   const { payments } = useUnappliedPayments({ clientId: invoice?.client_id });
 
@@ -45,6 +48,11 @@ export function useTabs(params: Params) {
     hasPermission('view_invoice') ||
     hasPermission('edit_invoice') ||
     entityAssigned(invoice);
+
+  const hasEInvoiceErrors = Object.keys(errors?.errors ?? {}).some(
+    (key) =>
+      key.startsWith('e_invoice') && !key.startsWith('e_invoice.InvoiceLine')
+  );
 
   const tabs: Tab[] = [
     {
@@ -58,7 +66,11 @@ export function useTabs(params: Params) {
         company?.settings.enable_e_invoice === true ||
         company?.settings.e_invoice_type === 'PEPPOL',
       formatName: () => (
-        <div className="flex space-x-1">
+        <div
+          className={classNames('flex space-x-1', {
+            'text-red-500': hasEInvoiceErrors,
+          })}
+        >
           <span>{t('e_invoice')}</span>
 
           {Boolean(

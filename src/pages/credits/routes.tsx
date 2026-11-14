@@ -70,6 +70,7 @@ export const creditRoutes = (
       }
     >
       <Route path="" element={<CreatePage />} />
+      <Route path="e_invoice" element={<EInvoice />} />
       <Route path="documents" element={<Documents />} />
       <Route path="settings" element={<Settings />} />
     </Route>

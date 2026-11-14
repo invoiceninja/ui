@@ -10,11 +10,11 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
-import { cloneDeep, get, set } from 'lodash';
+import { get } from 'lodash';
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdCheckCircle } from 'react-icons/md';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { Navigate, useLocation, useOutletContext } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
 import { useColorScheme } from '$app/common/colors';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
@@ -30,6 +30,7 @@ import { GenericManyResponse } from '$app/common/interfaces/generic-many-respons
 import { InvoiceActivity } from '$app/common/interfaces/invoice-activity';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Card, Element } from '$app/components/cards';
+import { withCreditReference } from '$app/components/e-invoice/line-fields/fields';
 import { Button, Link } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { InvoiceSelector } from '$app/components/invoices/InvoiceSelector';
@@ -74,7 +75,10 @@ export default function EInvoice() {
     errors,
   } = context;
 
+  const isCreatePage = location.pathname.includes('/create');
+
   const displayEInvoiceAndStatusCard =
+    !isCreatePage &&
     company?.settings.e_invoice_type === 'PEPPOL' &&
     company?.tax_data?.acts_as_sender;
 
@@ -118,6 +122,24 @@ export default function EInvoice() {
     },
   });
 
+  const handleReferenceChange = (number: string, date: string) => {
+    if (!number && !get(credit, 'e_invoice.CreditNote.BillingReference')) {
+      return;
+    }
+
+    setCredit(
+      (current) =>
+        current && {
+          ...current,
+          e_invoice: withCreditReference(
+            current.e_invoice,
+            number,
+            date
+          ) as Credit['e_invoice'],
+        }
+    );
+  };
+
   const handleSend = () => {
     toast.processing();
 
@@ -156,6 +178,10 @@ export default function EInvoice() {
 
     return text;
   };
+
+  if (isCreatePage && credit && !credit.client_id) {
+    return <Navigate to="/credits/create" replace />;
+  }
 
   return (
     <>
@@ -348,37 +374,13 @@ export default function EInvoice() {
                   ''
                 ) as string | undefined
               }
-              onChange={(value) => {
-                const updatedCredit = cloneDeep(credit) as Credit;
-                set(
-                  updatedCredit,
-                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID',
-                  value.number
-                );
-                set(
-                  updatedCredit,
-                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.IssueDate',
-                  value.date
-                );
-                setCredit(updatedCredit);
-              }}
-              onClearButtonClick={() => {
-                const updatedCredit = cloneDeep(credit) as Credit;
-                set(
-                  updatedCredit,
-                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID',
-                  ''
-                );
-                set(
-                  updatedCredit,
-                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.IssueDate',
-                  ''
-                );
-                setCredit(updatedCredit);
-              }}
+              onChange={(value) =>
+                handleReferenceChange(value.number, value.date)
+              }
+              onClearButtonClick={() => handleReferenceChange('', '')}
               errorMessage={
                 errors?.errors?.[
-                  'e_invoice.CreditNote.BillingReference.0.InvoiceDocumentReference.ID'
+                  'e_invoice.BillingReference.0.InvoiceDocumentReference.ID'
                 ]
               }
             />
