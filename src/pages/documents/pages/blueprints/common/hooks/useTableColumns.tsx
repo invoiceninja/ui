@@ -37,14 +37,20 @@ export function useTableColumns() {
   };
 
   const blueprintType = (blueprint: Blueprint) => {
-    let label = '';
+    if (blueprint.template_kind === 'authored_document') {
+      return 'WYSIWYG document';
+    }
+
+    if (blueprint.template_kind === 'uploaded_pdf') {
+      return 'Uploaded PDF';
+    }
 
     if (blueprint.design_hash?.length && blueprint.design_hash.length > 0) {
       const entity = blueprint.document?.metadata?.entity_type ?? 'ninja';
-      label = `${t(entity)} ${t('design')}`;
-    } else label = t('custom');
+      return `${t(entity)} ${t('design')}`;
+    }
 
-    return label;
+    return t('custom');
   };
 
   const columns: DataTableColumns<Blueprint> = [
@@ -58,9 +64,12 @@ export function useTableColumns() {
       label: t('name'),
       format: (field, blueprint) => (
         <Link
-          to={route('/docuninja/templates/:id/edit', {
-            id: blueprint.id,
-          })}
+          to={route(
+            blueprint.template_kind === 'authored_document'
+              ? '/docuninja/templates/:id/document-editor'
+              : '/docuninja/templates/:id/edit',
+            { id: blueprint.id }
+          )}
         >
           <span className="truncate block max-w-xs">
             {blueprint.name || t('untitled_template')}

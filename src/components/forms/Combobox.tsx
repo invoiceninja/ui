@@ -12,7 +12,16 @@ import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from 'react';
+import {
+  KeyboardEvent,
+  MouseEvent,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useClickAway, useDebounce } from 'react-use';
 import { styled } from 'styled-components';
@@ -72,9 +81,20 @@ export interface ComboboxStaticProps<T = any> {
   onInputValueChange?: (value: string) => void;
   compareOnlyByValue?: boolean;
   withShadow?: boolean;
+  portal?: boolean;
 }
 
 export type Nullable<T> = T | null;
+
+function Portal({
+  enabled,
+  children,
+}: {
+  enabled?: boolean;
+  children: ReactNode;
+}) {
+  return enabled ? createPortal(children, document.body) : children;
+}
 
 const HeadlessOptionStyled = styled(HeadlessCombobox.Option)`
   &:hover {
@@ -115,6 +135,7 @@ export function Combobox<T = any>({
   onFocus,
   onInputValueChange,
   withShadow,
+  portal,
 }: ComboboxStaticProps<T>) {
   const colors = useColorScheme();
   const reactSettings = useReactSettings();
@@ -128,6 +149,53 @@ export function Combobox<T = any>({
 
   const comboboxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  const [listStyle, setListStyle] = useState<React.CSSProperties>();
+
+  useLayoutEffect(() => {
+    if (!portal || !isOpen) {
+      return;
+    }
+
+    const update = () => {
+      const input = inputRef.current;
+
+      if (!input) {
+        return;
+      }
+
+      const rect = input.getBoundingClientRect();
+      const height = listRef.current?.offsetHeight ?? 0;
+      const below = rect.bottom + 4;
+      const above = rect.top - height - 4;
+
+      setListStyle({
+        position: 'fixed',
+        top: below + height > window.innerHeight && above > 0 ? above : below,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 1100,
+      });
+    };
+
+    update();
+
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+
+    const observer = new ResizeObserver(update);
+
+    if (listRef.current) {
+      observer.observe(listRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+      observer.disconnect();
+    };
+  }, [portal, isOpen]);
 
   let filteredOptions =
     inputValue === ''
@@ -268,7 +336,11 @@ export function Combobox<T = any>({
     }
   };
 
-  useClickAway(comboboxRef, () => {
+  useClickAway(comboboxRef, (event) => {
+    if (listRef.current?.contains(event.target as Node)) {
+      return;
+    }
+
     setIsOpen(false);
     onInputValueChange?.(inputValue);
 
@@ -423,69 +495,86 @@ export function Combobox<T = any>({
       </div>
 
       {isOpen && (
-        <ul
-          className="border absolute z-10 mt-1 rounded-md text-base shadow-2xl focus:outline-none sm:text-sm"
-          style={{ backgroundColor: colors.$1, borderColor: colors.$24 }}
-          tabIndex={-1}
-        >
-          <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-60 p-1">
-            {filteredOptions.map((option, index) => (
-              <LiStyled
-                theme={{
-                  backgroundColor: colors.$1,
-                  hoverColor: colors.$20,
-                }}
-                key={option.id}
-                className="flex items-center space-x-2 min-w-[14rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
-                onClick={() => handleOptionClick(option)}
-                data-combobox-element-id={index}
-                tabIndex={-1}
-              >
-                {highlightedIndex === index && (
-                  <div className="self-start mt-1">
-                    <Check size="0.9rem" color={colors.$3} />
-                  </div>
-                )}
-
-                <div
-                  className={classNames({
-                    'pl-6': highlightedIndex !== index && selectedOption?.value,
-                  })}
+        <Portal enabled={portal}>
+          <ul
+            ref={listRef}
+            className={classNames(
+              'border rounded-md text-base shadow-2xl focus:outline-none sm:text-sm',
+              portal ? 'fixed' : 'absolute z-10 mt-1'
+            )}
+            style={{
+              backgroundColor: colors.$1,
+              borderColor: colors.$24,
+              ...(portal ? listStyle : {}),
+            }}
+            tabIndex={-1}
+          >
+            <div className="flex flex-col overflow-y-auto overflow-x-hidden max-h-60 p-1">
+              {filteredOptions.map((option, index) => (
+                <LiStyled
+                  theme={{
+                    backgroundColor: colors.$1,
+                    hoverColor: colors.$20,
+                  }}
+                  key={option.id}
+                  className="flex items-center space-x-2 min-w-[14rem] relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                  onClick={() => handleOptionClick(option)}
+                  data-combobox-element-id={index}
+                  tabIndex={-1}
                 >
-                  {option.resource &&
-                  typeof entryOptions.dropdownLabelFn !== 'undefined'
-                    ? entryOptions.dropdownLabelFn(option.resource)
-                    : option.label}
-                </div>
-              </LiStyled>
-            ))}
-          </div>
+                  {highlightedIndex === index && (
+                    <div className="self-start mt-1">
+                      <Check size="0.9rem" color={colors.$3} />
+                    </div>
+                  )}
 
-          {action && action.visible && (
-            <div
-              className="border-t w-full p-1"
-              style={{ borderColor: colors.$21 }}
-            >
-              <ActionButtonStyled
-                theme={{
-                  hoverColor: colors.$20,
-                }}
-                data-testid="combobox-action-button"
-                type="button"
-                onClick={action.onClick}
-                className="flex items-center space-x-2 justify-start w-full relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
-                tabIndex={-1}
-                style={{ color: colors.$3 }}
-              >
-                <div>
-                  <Plus size="1rem" color={colors.$16} />
-                </div>
-
-                <span className="text-sm font-medium">{action.label}</span>
-              </ActionButtonStyled>
+                  <div
+                    className={classNames({
+                      'pl-6':
+                        highlightedIndex !== index && selectedOption?.value,
+                    })}
+                  >
+                    {option.resource &&
+                    typeof entryOptions.dropdownLabelFn !== 'undefined'
+                      ? entryOptions.dropdownLabelFn(option.resource)
+                      : option.label}
+                  </div>
+                </LiStyled>
+              ))}
             </div>
-          )}
-        </ul>
+
+            {action && action.visible && (
+              <div
+                className="border-t w-full p-1"
+                style={{ borderColor: colors.$21 }}
+              >
+                <ActionButtonStyled
+                  theme={{
+                    hoverColor: colors.$20,
+                  }}
+                  data-testid="combobox-action-button"
+                  type="button"
+                  onClick={() => {
+                    if (portal) {
+                      setIsOpen(false);
+                    }
+
+                    action.onClick();
+                  }}
+                  className="flex items-center space-x-2 justify-start w-full relative cursor-pointer select-none py-2 px-3 rounded-[0.1875rem]"
+                  tabIndex={-1}
+                  style={{ color: colors.$3 }}
+                >
+                  <div>
+                    <Plus size="1rem" color={colors.$16} />
+                  </div>
+
+                  <span className="text-sm font-medium">{action.label}</span>
+                </ActionButtonStyled>
+              </div>
+            )}
+          </ul>
+        </Portal>
       )}
 
       <ErrorMessage className="mt-2">{errorMessage}</ErrorMessage>

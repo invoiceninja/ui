@@ -47,11 +47,19 @@ export function CustomBlueprintStep({
   function handleCreateBlueprint() {
     setErrors(undefined);
 
-    request('POST', docuNinjaEndpoint('/api/blueprints'), payload, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+    request(
+      'POST',
+      docuNinjaEndpoint('/api/blueprints'),
+      {
+        ...payload,
+        template_kind: 'uploaded_pdf',
       },
-    })
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('X-DOCU-NINJA-TOKEN')}`,
+        },
+      }
+    )
       .then((response: GenericSingleResourceResponse<Document>) => {
         toast.success('template_created');
         $refetch(['blueprints']);

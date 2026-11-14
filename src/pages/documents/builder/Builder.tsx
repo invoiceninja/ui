@@ -13,8 +13,7 @@ import {
   BuilderContext,
   CreateDialogProps,
   Document,
-  SendDialogButtonProps,
-  SendDialogProps,
+  darkBuilderTheme,
   useBuilderStore,
 } from '@docuninja/builder2.0';
 import { useAtomValue } from 'jotai';
@@ -31,9 +30,10 @@ import { isEmbedded, openOutside, postToHost } from '$app/common/helpers/embed';
 import { request } from '$app/common/helpers/request';
 import { route, routeWithOrigin } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useDriverTour } from '$app/common/hooks/useDriverTour';
 import { usePreferences } from '$app/common/hooks/usePreferences';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { $refetch } from '$app/common/hooks/useRefetch';
 import { DocumentStatus } from '$app/common/interfaces/docuninja/api';
 import { Page } from '$app/components/Breadcrumbs';
@@ -41,72 +41,13 @@ import { Card } from '$app/components/cards';
 import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Default } from '$app/components/layouts/Default';
-import { Modal } from '$app/components/Modal';
 import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import {
   SignatorySelector,
   SignatorySwap,
 } from '../pages/blueprints/builder/Elements';
-import {
-  Alertbox,
-  ConfirmationDialog,
-  ConfirmationDialogButton,
-  CreateDialogTabButton,
-  CreateUserForm,
-  DeleteButton,
-  DeleteDialog,
-  ImportFromGoogleDrive,
-  Loading,
-  MapSignatoriesFlowButton,
-  MapSignatoriesFlowDialog,
-  RectangleSettingsButton,
-  RectangleSettingsCheckbox,
-  RectangleSettingsDialog,
-  RectangleSettingsInput,
-  RectangleSettingsLabel,
-  RectangleSettingsOptionItem,
-  RectangleSettingsOptionsList,
-  RectangleSettingsRemoveButton,
-  RectangleSettingsSaveButton,
-  RectangleSettingsSelect,
-  ToolboxContext,
-  UninviteButton,
-  UninviteDialog,
-  Upload,
-  UploadDialog,
-  ValidationErrors,
-} from './components';
+import { ImportFromGoogleDrive } from './google-drive';
 import { useEmbeddedBuilderEvents } from './useEmbeddedBuilderEvents';
-
-function SendDialog({ open, onOpenChange, content, action }: SendDialogProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Modal title={t('send_confirmation')} visible={open} onClose={onOpenChange}>
-      {content}
-
-      {action}
-    </Modal>
-  );
-}
-
-function SendDialogButton({ isSubmitting }: SendDialogButtonProps) {
-  const [t] = useTranslation();
-
-  return (
-    <Button
-      className="w-full"
-      behavior="button"
-      disabled={isSubmitting}
-      onClick={() =>
-        window.dispatchEvent(new CustomEvent('builder:send.document.submit'))
-      }
-      disableWithoutIcon
-    >
-      {t('send')}
-    </Button>
-  );
-}
 
 export function CreateDialog({ open, onOpenChange }: CreateDialogProps) {
   const [t] = useTranslation();
@@ -171,6 +112,8 @@ function Builder() {
   const { t, i18n } = useTranslation();
 
   const { id } = useParams();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+  const reactSettings = useReactSettings();
   const [searchParams] = useSearchParams();
   const isFromTemplate = searchParams.get('from_template') === 'true';
 
@@ -199,8 +142,6 @@ function Builder() {
     useMediaQuery({ query: '(max-width: 1023px)' }) && isEmbedded();
 
   const { preferences, update, save } = usePreferences();
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
   useDriverTour({
     show: Boolean(!isFromTemplate && !preferences.document_builder_tour_shown),
@@ -410,22 +351,12 @@ function Builder() {
     );
   };
 
-  const getInvitationId = () => {
-    const currentInvitationIndex = entity?.invitations?.findIndex(
-      (invitation) => invitation.user_id === docuninjaAccount?.id
-    ) as unknown as number;
-
-    if (currentInvitationIndex === -1) {
-      return null;
-    }
-
-    const currentInvitation = entity?.invitations?.[currentInvitationIndex];
-
-    if (!entity?.invitations?.[currentInvitationIndex]?.client_contact_id) {
-      return currentInvitation?.id;
-    }
-
-    return null;
+  const getInvitation = () => {
+    return entity?.invitations?.find(
+      (invitation) =>
+        invitation.user_id === docuninjaAccount?.id &&
+        !invitation.client_contact_id
+    );
   };
 
   useEffect(() => {
@@ -539,17 +470,23 @@ function Builder() {
       breadcrumbs={pages}
       navigationTopRight={
         <div className="flex items-center gap-2">
-          {getInvitationId() && (
+          {getInvitation() && (
             <Button
               type="secondary"
               behavior="button"
               onClick={() => {
+                const invitation = getInvitation();
+
+                if (!invitation) {
+                  return;
+                }
+
                 const url = routeWithOrigin(
                   '/docuninja/sign/:document/:invitation?sig=:sig&company=:company',
                   {
                     document: id,
-                    invitation: getInvitationId(),
-                    sig: getInvitationId(),
+                    invitation: invitation.id,
+                    sig: (invitation as { sig?: string | null }).sig ?? '',
                     company: getDocuNinjaCompany()?.id,
                   }
                 );
@@ -617,73 +554,28 @@ function Builder() {
         style={{ borderColor: colors.$24 }}
         withoutBodyPadding
       >
-        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-        {/* @ts-ignore - BuilderContext.Provider type conflict with external types */}
         <BuilderContext.Provider
           value={{
             token: localStorage.getItem('X-DOCU-NINJA-TOKEN') as string,
             document: id as string,
-            components: {
-              skeleton: Loading,
-              createBlueprintSignatory: () => null,
-              save: () => null,
-              send: {
-                trigger: () => null,
-                dialog: SendDialog,
-                button: SendDialogButton,
-              },
-              delete: {
-                dialog: DeleteDialog,
-                button: DeleteButton,
-              },
-              upload: {
-                trigger: Upload,
-                dialog: UploadDialog,
-              },
-              confirmation: {
-                dialog: ConfirmationDialog,
-                button: ConfirmationDialogButton,
-              },
+            theme: reactSettings?.dark_mode ? darkBuilderTheme : undefined,
+            slots: {
+              helper: () => null,
+              signatorySelector: SignatorySelector,
+              signatorySwap: SignatorySwap,
               createSignatory: {
                 dialog: CreateDialog,
                 client: {
                   form: () => null,
-                  button: CreateDialogTabButton,
+                  button: () => null,
                 },
                 user: {
-                  form: CreateUserForm,
-                  button: CreateDialogTabButton,
+                  form: () => null,
+                  button: () => null,
                 },
               },
-              signatorySelector: SignatorySelector,
-              signatorySwap: SignatorySwap,
-              mapSignatoriesFlow: {
-                dialog: MapSignatoriesFlowDialog,
-                button: MapSignatoriesFlowButton,
-              },
-              uninvite: {
-                dialog: UninviteDialog,
-                button: UninviteButton,
-              },
-              validationErrors: ValidationErrors,
-              sign: () => null,
-              toolboxContext: ToolboxContext,
-              helper: () => null,
-              alert: Alertbox,
               imports: {
                 googleDrive: ImportFromGoogleDrive,
-              },
-              rectangleSettings: {
-                dialog: RectangleSettingsDialog,
-                save: RectangleSettingsSaveButton,
-                button: RectangleSettingsButton,
-                input: RectangleSettingsInput,
-                label: RectangleSettingsLabel,
-                checkbox: RectangleSettingsCheckbox,
-                select: RectangleSettingsSelect,
-                removeButton: RectangleSettingsRemoveButton,
-                optionItem: RectangleSettingsOptionItem,
-                optionsList: RectangleSettingsOptionsList,
               },
             },
             styles: {
@@ -740,6 +632,9 @@ function Builder() {
               header: {
                 sticky: false,
               },
+              showSaveButton: false,
+              showSignButton: false,
+              showSendButton: false,
               leftSidebar: {
                 visible: !isNinjaDocument,
               },
@@ -762,9 +657,9 @@ function Builder() {
               undefined,
             readonly: false,
             defaultDateFormat: dateFormat as
-              | "MM/DD/YYYY"
-              | "DD/MM/YYYY"
-              | "YYYY-MM-DD",
+              | 'MM/DD/YYYY'
+              | 'DD/MM/YYYY'
+              | 'YYYY-MM-DD',
             onEntityReady: (entity) => setEntity(entity as Document),
             onEntityRefresh: (entity) => setEntity(entity as Document),
             services: {
@@ -785,7 +680,5 @@ function Builder() {
     </Default>
   );
 }
-
-export { Alertbox, ImportFromGoogleDrive } from './components';
 
 export default Builder;

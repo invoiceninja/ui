@@ -274,6 +274,7 @@ export function AsyncSignatorySelector({
           onClick: () => setCreateDialogOpen(true),
         }}
         withShadow
+        portal
       />
     </div>
   );

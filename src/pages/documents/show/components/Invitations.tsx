@@ -99,15 +99,12 @@ function Invitation({ invitation, document }: InvitationProps) {
   const [isSendingInvitation, setIsSendingInvitation] =
     useState<boolean>(false);
 
-  const [isSendConfirmOpen, setIsSendConfirmOpen] =
-    useState<boolean>(false);
+  const [isSendConfirmOpen, setIsSendConfirmOpen] = useState<boolean>(false);
 
   const canSendInvitation = (invitation: DocumentInvitation) => {
     const invitations = document.invitations || [];
 
-    const usesOrderedSigning = invitations.some(
-      (i) => i.signing_order != null
-    );
+    const usesOrderedSigning = invitations.some((i) => i.signing_order != null);
 
     if (!usesOrderedSigning) {
       return true;
@@ -115,9 +112,7 @@ function Invitation({ invitation, document }: InvitationProps) {
 
     const current = [...invitations]
       .filter((i) => !i.signed_date)
-      .sort(
-        (a, b) => (a.signing_order ?? 0) - (b.signing_order ?? 0)
-      )[0];
+      .sort((a, b) => (a.signing_order ?? 0) - (b.signing_order ?? 0))[0];
 
     return current?.id === invitation.id;
   };
@@ -203,7 +198,9 @@ function Invitation({ invitation, document }: InvitationProps) {
 
   const handleCopyLink = () => {
     const link = routeWithOrigin(
-      `/docuninja/sign/${document.id}/${invitation.id}`
+      `/docuninja/sign/${document.id}/${invitation.id}?sig=${
+        invitation.sig ?? ''
+      }`
     );
     navigator.clipboard.writeText(link);
     toast.success(t('link_copied') || 'Link copied to clipboard');
